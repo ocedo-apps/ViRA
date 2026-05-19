@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#FFFFFF</color>
+    <color name="text_main">#4D2D1D</color>
+    <color name="text_muted">#666666</color>
+    <color name="card_warm_bg">#DDBB99</color>
+
+    <color name="sunset_text_main">#FCDEBB</color>
+    <color name="sunset_start">#F29F41</color>
+    <color name="sunset_end">#B72B08</color>
+    <color name="accent_orange">#FFAB00</color>
+
+    <color name="text_white">#FFFFFF</color>
+    <color name="text_dark_gray">#333333</color>
+
+    <color name="sunset_orange">#B44305</color>
+    <color name="sunset_creme">#FCDEBB</color>
+    <color name="sunset_creme_inactive">#80FCDEBB</color>
+    <color name="warning_red">#dd2200</color>
+    <color name="dialog_input_text">#212121</color>
+    <color name="dialog_hint_dark">#80212121</color>
+</resources>

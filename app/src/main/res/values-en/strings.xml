@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ArbetsLoggPro</string>
+    <string name="date_today">TODAY</string>
+    <string name="date_yesterday">YESTERDAY</string>
+    <string name="status_logged_time">LOGGED TIME</string>
+    <string name="empty_value">---</string>
+
+    <string name="settings_title">SETTINGS</string>
+    <string name="settings_smarthelp_title">SMARTHELP</string>
+    <string name="toggle_off">OFF</string>
+    <string name="toggle_on">ON</string>
+    <string name="settings_mode_employee">EMPLOYEE</string>
+    <string name="settings_mode_consultant">CONSULTANT</string>
+    <string name="settings_smarthelp_desc">Choose how intelligently the app should handle your check-ins and check-outs.</string>
+    <string name="settings_calendar_title">CALENDAR INTEGRATION</string>
+    <string name="settings_consultant_goal_title">Consultant hours, monthly goal</string>
+    <string name="settings_consultant_goal_hint">E.g. 160</string>
+    <string name="settings_workplaces_title">MY WORKPLACES</string>
+    <string name="settings_workplace_name_hint">E.g. Office or Home</string>
+    <string name="settings_defaults_title">DEFAULT TIMES &amp; GOALS</string>
+    <string name="settings_daily_goal_title">Daily goal (hours)</string>
+    <string name="settings_lunch_minutes_title">Default lunch deduction (minutes)</string>
+    <string name="settings_rounding_title">Time rounding</string>
+    <string name="settings_save_button">SAVE ALL SETTINGS</string>
+
+    <string name="wifi_lost">WI-FI LOST!</string>
+    <string name="warning_outside_zone">WARNING: OUTSIDE THE ZONE!</string>
+    <string name="status_checked_out">Checked out</string>
+    <string name="circle_in_time">IN: %1$s</string>
+
+    <string name="toggle_in_manual">CHECKED IN (MANUAL)</string>
+    <string name="toggle_in_auto">CHECKED IN (AUTO)</string>
+    <string name="toggle_out_manual">CHECKED OUT (MANUAL)</string>
+    <string name="toggle_out_auto">CHECKED OUT (AUTO)</string>
+    <string name="toggle_out_default">CHECKED OUT</string>
+
+    <string name="pepp_new_day">WELCOME TO A NEW DAY!</string>
+    <string name="pepp_opportunities">NEW DAY, NEW OPPORTUNITIES!</string>
+    <string name="pepp_lunch">HOPE EVERYTHING IS RUNNING SMOOTHLY!</string>
+    <string name="pepp_almost_there">ALMOST THERE, THE FINAL SPRINT!</string>
+    <string name="pepp_goal_reached">GOAL REACHED! YOU\'RE A STAR! ⭐</string>
+    <string name="pepp_overtime">OVERTIME WORK?</string>
+    <string name="pepp_late_worker">WHEN THE SUN SETS IN THE WEST, THE LAZY MAN WORKS BEST ;)</string>
+    <string name="pepp_forgot_phone">FORGOT YOUR PHONE AT WORK?</string>
+    <string name="pepp_good_work">GREAT JOB TODAY!</string>
+    <string name="pepp_checked_in">CHECKED IN</string>
+    <string name="pepp_welcome_back">WELCOME BACK!</string>
+    <string name="pepp_goodbye">Great job today!</string>
+    <string name="pepp_checked_out">CHECKED OUT</string>
+
+    <string name="month_balance_format">%1$s%2$dh %3$02dm</string>
+
+    <string name="report_title">TIME REPORT</string>
+    <string name="report_weekly_total_placeholder">THIS WEEK - 0h 0min</string>
+    <string name="report_monthly_total_placeholder">THIS MONTH - 0h 0min</string>
+    <string name="report_export_all">EXPORT ALL CUSTOMERS</string>
+</resources>

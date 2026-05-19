@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ArbeidsLoggPro</string>
+    <string name="date_today">I DAG</string>
+    <string name="date_yesterday">I GÅR</string>
+    <string name="status_logged_time">LOGGET TID</string>
+    <string name="empty_value">---</string>
+
+    <string name="settings_title">INNSTILLINGER</string>
+    <string name="settings_smarthelp_title">SMARTHELP</string>
+    <string name="toggle_off">AV</string>
+    <string name="toggle_on">PÅ</string>
+    <string name="settings_mode_employee">ANSATT</string>
+    <string name="settings_mode_consultant">KONSULENT</string>
+    <string name="settings_smarthelp_desc">Velg hvor intelligent appen skal håndtere inn- og utsjekkene dine.</string>
+    <string name="settings_calendar_title">KALENDERINTEGRASJON</string>
+    <string name="settings_consultant_goal_title">Konsulenttimer, mål per måned</string>
+    <string name="settings_consultant_goal_hint">F.eks. 160</string>
+    <string name="settings_workplaces_title">MINE ARBEIDSPLASSER</string>
+    <string name="settings_workplace_name_hint">F.eks. Jerven eller Hjemmet</string>
+    <string name="settings_defaults_title">STANDARDTIDER &amp; MÅL</string>
+    <string name="settings_daily_goal_title">Dagsmål (timer)</string>
+    <string name="settings_lunch_minutes_title">Standard lunsjavtrekk (minutter)</string>
+    <string name="settings_rounding_title">Tidsavrunding</string>
+    <string name="settings_save_button">LAGRE ALLE INNSTILLINGER</string>
+
+    <string name="wifi_lost">WIFI MISTET!</string>
+    <string name="warning_outside_zone">ADVARSEL: UTENFOR SONEN!</string>
+    <string name="status_checked_out">Utsjekket</string>
+    <string name="circle_in_time">INN: %1$s</string>
+
+    <string name="toggle_in_manual">INSJEKKET (MANUELL)</string>
+    <string name="toggle_in_auto">INSJEKKET (AUTO)</string>
+    <string name="toggle_out_manual">UTSJEKKET (MANUELL)</string>
+    <string name="toggle_out_auto">UTSJEKKET (AUTO)</string>
+    <string name="toggle_out_default">UTSJEKKET</string>
+
+    <string name="pepp_new_day">VELKOMMEN TIL EN NY DAG!</string>
+    <string name="pepp_opportunities">NY DAG, NYE MULIGHETER!</string>
+    <string name="pepp_lunch">HÅPER ALT GÅR PÅ SKINNER!</string>
+    <string name="pepp_almost_there">NESTEN DER, SISTESPURTEN!</string>
+    <string name="pepp_goal_reached">MÅLET NÅDD! DU ER EN STJERNE! ⭐</string>
+    <string name="pepp_overtime">OVERTIDSARBEID?</string>
+    <string name="pepp_late_worker">NÅR SOLA GÅR I VEST ARBEIDER DEN LATE BEST ;)</string>
+    <string name="pepp_forgot_phone">GLEMT TELEFONEN PÅ JOBBEN?</string>
+    <string name="pepp_good_work">BRA JOBBET I DAG!</string>
+    <string name="pepp_checked_in">INSJEKKET</string>
+    <string name="pepp_welcome_back">VELKOMMEN TILBAKE!</string>
+    <string name="pepp_goodbye">Bra jobbet i dag!</string>
+    <string name="pepp_checked_out">UTSJEKKET</string>
+
+    <string name="month_balance_format">%1$s%2$dt %3$02dm</string>
+
+    <string name="report_title">TIDSRAPPORT</string>
+    <string name="report_weekly_total_placeholder">DENNE UKEN - 0t 0min</string>
+    <string name="report_monthly_total_placeholder">DENNE MÅNEDEN - 0t 0min</string>
+    <string name="report_export_all">EKSPORTER ALLE KUNDER</string>
+</resources>

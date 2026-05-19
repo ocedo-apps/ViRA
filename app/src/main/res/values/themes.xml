@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.ArbetsLoggPro" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:fontFamily">@font/asap_light</item>
+        <item name="colorPrimary">@color/accent_orange</item>
+        <item name="colorAccent">@color/accent_orange</item>
+        <item name="android:statusBarColor">@color/sunset_start</item>
+        <item name="android:windowBackground">@drawable/bg_sunset_gradient</item>
+    </style>
+
+    <style name="JobbzonDialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="colorSurface">#D9FCDEBB</item>
+        <item name="shapeAppearanceOverlay">@style/JobbzonDialogCorners</item>
+
+        <item name="materialAlertDialogTitleTextStyle">@style/JobbzonDialogTitleText</item>
+
+        <item name="buttonBarPositiveButtonStyle">@style/JobbzonDialogButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/JobbzonDialogButton</item>
+
+        <item name="android:textColorPrimary">#212121</item>
+        <item name="android:textColorSecondary">#66212121</item>
+    </style>
+
+    <style name="JobbzonDialogCorners">
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="JobbzonDialogTitleText" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:fontFamily">@font/asap_black</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">#B44305</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+
+    <style name="JobbzonDialogButton" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">#B44305</item>
+
+        <item name="android:textColor">#FCDEBB</item>
+
+        <item name="android:fontFamily">@font/asap_black</item>
+        <item name="android:textAllCaps">true</item>
+
+        <item name="cornerRadius">8dp</item>
+        <item name="android:layout_marginLeft">8dp</item>
+        <item name="android:layout_marginRight">8dp</item>
+    </style>
+
+</resources>
