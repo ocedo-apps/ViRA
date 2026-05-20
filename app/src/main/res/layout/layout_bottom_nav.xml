@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:fontFamily="@font/asap_light"
-            android:text="Dashboard"
+            android:text="@string/nav_dashboard"
             android:textColor="@color/sunset_text_main"
             android:textSize="11sp" />
     </LinearLayout>
@@ -58,7 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:fontFamily="@font/asap_light"
-            android:text="Historik"
+            android:text="@string/nav_calendar"
             android:textColor="@color/sunset_text_main"
             android:textSize="11sp" />
     </LinearLayout>
@@ -85,7 +85,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:fontFamily="@font/asap_light"
-            android:text="Rapporter"
+            android:text="@string/nav_reports"
             android:textColor="@color/sunset_text_main"
             android:textSize="11sp" />
     </LinearLayout>
@@ -112,7 +112,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:fontFamily="@font/asap_light"
-            android:text="Inställningar"
+            android:text="@string/nav_settings"
             android:textColor="@color/sunset_text_main"
             android:textSize="11sp" />
     </LinearLayout>

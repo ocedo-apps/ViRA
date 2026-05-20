@@ -3,6 +3,7 @@ package com.dinatid.arbetslogg.data
 import android.content.Context
 import android.content.SharedPreferences
 import com.dinatid.arbetslogg.AppDatabase
+import com.dinatid.arbetslogg.DailyNote
 import com.dinatid.arbetslogg.WorkLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -11,6 +12,7 @@ import java.util.Calendar
 class TimeRepository(private val context: Context) {
 
     private val database = AppDatabase.getDatabase(context)
+    private val dailyNoteDao = database.dailyNoteDao() // --- NY: Hämtar vår nya DAO för kommentarer ---
     private val sharedPrefs: SharedPreferences = context.getSharedPreferences("arbetslogg_prefs", Context.MODE_PRIVATE)
 
     // --- DATABASHANTERING (Måste vara suspend och köras på bakgrundstrådar) ---
@@ -33,6 +35,16 @@ class TimeRepository(private val context: Context) {
 
     suspend fun deleteLog(log: WorkLog) = withContext(Dispatchers.IO) {
         database.workLogDao().delete(log)
+    }
+
+    // --- NY FUNKTION: DAGBOK / DAGLIGA KOMMENTARER ---
+
+    suspend fun getNoteForDay(dateStr: String): String? = withContext(Dispatchers.IO) {
+        dailyNoteDao.getNoteForDay(dateStr)?.note
+    }
+
+    suspend fun saveNoteForDay(dateStr: String, noteText: String) = withContext(Dispatchers.IO) {
+        dailyNoteDao.insertOrUpdateNote(DailyNote(dateStr, noteText))
     }
 
     // --- NY FUNKTION: Arkitektonisk flytt av midnattssplitten från WiFiService/ViewModel ---

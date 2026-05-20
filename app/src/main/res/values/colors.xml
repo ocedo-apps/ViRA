@@ -19,4 +19,6 @@
     <color name="warning_red">#dd2200</color>
     <color name="dialog_input_text">#212121</color>
     <color name="dialog_hint_dark">#80212121</color>
+
+    <color name="calendar_weekend_bg">#10000000</color>
 </resources>

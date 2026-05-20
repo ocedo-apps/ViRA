@@ -51,4 +51,33 @@
     <string name="report_weekly_total_placeholder">DENNA VECKA - 0h 0min</string>
     <string name="report_monthly_total_placeholder">DENNA MÅNAD - 0h 0min</string>
     <string name="report_export_all">EXPORTERA ALLA KUNDER</string>
+
+    <string name="holiday_nyarsdagen">GOTT NYTT ÅR! 🎉</string>
+    <string name="holiday_trettondedag_jul">God fortsättning! ❄️</string>
+    <string name="holiday_langfredagen">En lugn och skön långfredag önskas. 🕊️</string>
+    <string name="holiday_pask">GLAD PÅSK! 🐣</string>
+    <string name="holiday_forsta_maj">FÖRSTA MAJ VÄLKOMMEN! 🌲</string>
+    <string name="holiday_kristi_himmelsfard">Ha en fin Kristi himmelsfärd! ☀️</string>
+    <string name="holiday_nationaldag">GLAD NATIONALDAG! 🇸🇪</string>
+    <string name="holiday_midsommar">GLAD MIDSOMMAR! 🌸</string>
+    <string name="holiday_jul">GOD JUL! 🎄</string>
+    <string name="holiday_nyarsafton">GOTT NYTT ÅR! 🎆</string>
+    <string name="holiday_default_format">GLAD %1$s! 🎉</string>
+
+    <string name="dialog_title_dagsanteckning">DAGSANTECKNING</string>
+    <string name="btn_dagsanteckning">📝 DAGSANTECKNING</string>
+    <string name="btn_spara">SPARA</string>
+    <string name="hint_dagsanteckning">Skriv eller prata in anteckning…</string>
+    <string name="prompt_speak">Prata nu…</string>
+    <string name="error_mic_not_supported">Röstinmatning stöds inte på denna enhet</string>
+
+    <string name="msg_logged_time_format">Loggad tid: %1$dh %2$dm\n\n</string>
+    <string name="msg_your_note">\n📝 Din anteckning:\n\"%1$s\"</string>
+    <string name="msg_ledig_day">Du var ledig denna dag.\n</string>
+    <string name="msg_no_time_logged">Ingen tid loggad.\n</string>
+
+    <string name="nav_dashboard">Idag</string>
+    <string name="nav_calendar">Kalender</string>
+    <string name="nav_reports">Rapporter</string>
+    <string name="nav_settings">Inställningar</string>
 </resources>
