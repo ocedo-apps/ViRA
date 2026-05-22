@@ -54,6 +54,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
     implementation("androidx.activity:activity-ktx:1.8.2")
 
+    // --- HÄR ÄR VÅR NYA RAD SOM LÖSER FELET ---
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
+
     // Room Database
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")

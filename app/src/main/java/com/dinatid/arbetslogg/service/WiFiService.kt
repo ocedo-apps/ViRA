@@ -98,7 +98,12 @@ class WiFiService : Service() {
             val isCurrentlyOnWifi = capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
 
             val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-            val info: WifiInfo? = wifiManager.connectionInfo
+            val info: WifiInfo? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                capabilities?.transportInfo as? WifiInfo
+            } else {
+                @Suppress("DEPRECATION")
+                wifiManager.connectionInfo
+            }
             val ssid = info?.ssid?.replace("\"", "")?.trim() ?: ""
 
             val prefs = applicationContext.getSharedPreferences("arbetslogg_prefs", Context.MODE_PRIVATE)
@@ -241,6 +246,8 @@ class WiFiService : Service() {
                 disconnectTimestamp = System.currentTimeMillis()
                 updateNotification("Loggar ut automatiskt om 5 min...")
                 Log.d("ARBETSLOGG_WIFI", "Nedräkningstimer startad vid timestamp: $disconnectTimestamp")
+                // Meddela UI direkt att nedräkningen börjat
+                notifyDataChanged()
             }
         }
     }
@@ -272,6 +279,9 @@ class WiFiService : Service() {
                 // 2. TYNGRE KOLLAR (Körs nu bara en gång i minuten istället för varje sekund!)
                 if (now - lastDbCheckTime >= 60000L) {
                     lastDbCheckTime = now
+                    
+                    // Backup-koll av Wi-Fi om systemet missat att skicka callback
+                    checkCurrentWifi()
 
                     val lastLog = repository.getLastLog()
                     val nowCal = Calendar.getInstance()
@@ -360,6 +370,7 @@ class WiFiService : Service() {
                 Log.d("ARBETSLOGG_WIFI", "Skriver IN-logg till databasen för: $workplaceName")
                 repository.insertLog(WorkLog(type = "IN", timestamp = System.currentTimeMillis(), ssid = workplaceName))
                 updateNotification("Incheckad på $workplaceName (Auto)")
+                notifyDataChanged()
             }
         }
     }
@@ -374,12 +385,18 @@ class WiFiService : Service() {
                 val workplaceName = lastLog.ssid ?: "Okänd arbetsplats"
 
                 // Anropa den centraliserade midnattssplitten i ditt repository!
-                repository.insertAutoLogoutWithMidnightSplit(inTime, outTime, workplaceName)
+                repository.insertLogoutWithMidnightSplit(inTime, outTime, workplaceName, false)
 
                 Log.d("ARBETSLOGG_WIFI", "Utloggningslogg sparad i DB via Repositoryt.")
                 updateNotification("Utcheckad från $workplaceName (Auto)")
+                notifyDataChanged()
             }
         }
+    }
+
+    private fun notifyDataChanged() {
+        val intent = Intent("REFRESH_DATA")
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
     private fun sendCountdownUpdate(secondsLeft: Int) {

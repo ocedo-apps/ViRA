@@ -35,7 +35,7 @@
         <item name="android:textSize">22sp</item>
     </style>
 
-    <style name="JobbzonDialogButton" parent="Widget.MaterialComponents.Button">
+    <style name="JobbzonDialogButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="backgroundTint">#B44305</item>
 
         <item name="android:textColor">#FCDEBB</item>
@@ -44,8 +44,11 @@
         <item name="android:textAllCaps">true</item>
 
         <item name="cornerRadius">8dp</item>
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginRight">8dp</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:insetTop">4dp</item>
+        <item name="android:insetBottom">4dp</item>
     </style>
 
 </resources>

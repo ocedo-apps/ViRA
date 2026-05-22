@@ -48,15 +48,16 @@ class TimeRepository(private val context: Context) {
     }
 
     // --- NY FUNKTION: Arkitektonisk flytt av midnattssplitten från WiFiService/ViewModel ---
-    suspend fun insertAutoLogoutWithMidnightSplit(inTime: Long, outTime: Long, workplaceName: String) = withContext(Dispatchers.IO) {
+    suspend fun insertLogoutWithMidnightSplit(inTime: Long, outTime: Long, ssid: String, isManual: Boolean) = withContext(Dispatchers.IO) {
         val inCal = Calendar.getInstance().apply { timeInMillis = inTime }
         val outCal = Calendar.getInstance().apply { timeInMillis = outTime }
+        val outType = if (isManual) WorkLog.TYPE_OUT_MANUAL else WorkLog.TYPE_OUT_AUTO
 
         // Om passet startade och slutade på samma kalenderdag, gör en helt vanlig utcheckning
         if (inCal.get(Calendar.YEAR) == outCal.get(Calendar.YEAR) &&
             inCal.get(Calendar.DAY_OF_YEAR) == outCal.get(Calendar.DAY_OF_YEAR)) {
 
-            insertLog(WorkLog(type = "UT (Auto)", timestamp = outTime, ssid = workplaceName))
+            insertLog(WorkLog(type = outType, timestamp = outTime, ssid = ssid))
         } else {
             // Om passet sträcker sig över midnatt påbörjas splittnings-loopen
             val currentStart = inCal.clone() as Calendar
@@ -72,7 +73,7 @@ class TimeRepository(private val context: Context) {
                 endOfDay.set(Calendar.SECOND, 59)
                 endOfDay.set(Calendar.MILLISECOND, 999)
 
-                insertLog(WorkLog(type = "UT (Auto)", timestamp = endOfDay.timeInMillis, ssid = workplaceName))
+                insertLog(WorkLog(type = outType, timestamp = endOfDay.timeInMillis, ssid = ssid))
 
                 // Hoppa fram till 00:00:00.000 nästa dag och starta ett nytt pass
                 currentStart.add(Calendar.DAY_OF_YEAR, 1)
@@ -81,10 +82,10 @@ class TimeRepository(private val context: Context) {
                 currentStart.set(Calendar.SECOND, 0)
                 currentStart.set(Calendar.MILLISECOND, 0)
 
-                insertLog(WorkLog(type = "IN", timestamp = currentStart.timeInMillis, ssid = workplaceName))
+                insertLog(WorkLog(type = WorkLog.TYPE_IN, timestamp = currentStart.timeInMillis, ssid = ssid))
             }
             // Logga ut slutgiltigt på den sista dagen där Wi-Fi-tappet faktiskt skedde
-            insertLog(WorkLog(type = "UT (Auto)", timestamp = outTime, ssid = workplaceName))
+            insertLog(WorkLog(type = outType, timestamp = outTime, ssid = ssid))
         }
     }
 
@@ -149,5 +150,13 @@ class TimeRepository(private val context: Context) {
 
     fun setRoundingInterval(minutes: Int) {
         sharedPrefs.edit().putInt("rounding_interval", minutes).apply()
+    }
+
+    fun hasDeclinedWorkplaceSetup(): Boolean {
+        return sharedPrefs.getBoolean("declined_workplace_setup", false)
+    }
+
+    fun setDeclinedWorkplaceSetup(declined: Boolean) {
+        sharedPrefs.edit().putBoolean("declined_workplace_setup", declined).apply()
     }
 }

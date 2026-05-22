@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ArbetsLoggPro</string>
+    <string name="app_name">Jobbzon</string>
     <string name="date_today">TODAY</string>
     <string name="date_yesterday">YESTERDAY</string>
     <string name="status_logged_time">LOGGED TIME</string>
@@ -17,7 +17,7 @@
     <string name="settings_consultant_goal_title">Consultant hours, monthly goal</string>
     <string name="settings_consultant_goal_hint">E.g., 160</string>
     <string name="settings_workplaces_title">MY WORKPLACES</string>
-    <string name="settings_workplace_name_hint">E.g., Office or Home</string>
+    <string name="settings_workplace_name_hint">E.g., Office or Store</string>
     <string name="settings_defaults_title">DEFAULT TIMES &amp; GOALS</string>
     <string name="settings_daily_goal_title">Daily goal (hours)</string>
     <string name="settings_lunch_minutes_title">Standard lunch deduction (minutes)</string>
@@ -80,4 +80,24 @@
     <string name="nav_calendar">Calendar</string>
     <string name="nav_reports">Reports</string>
     <string name="nav_settings">Settings</string>
+
+    <string name="calendar_ongoing">Ongoing</string>
+    <string name="calendar_lunch">LUNCH</string>
+    <string name="calendar_vacation">Day off</string>
+    <string name="calendar_unknown_ssid">Unknown</string>
+    <string name="calendar_ongoing_status">ONGOING NOW&#8230;</string>
+
+    <string name="setup_workplace_title">Welcome to Jobbzon! 🏗️</string>
+    <string name="setup_workplace_msg">You haven\'t added a workplace or Wi-Fi yet. Would you like to set it up now so the app can log your time automatically?</string>
+    <string name="setup_workplace_yes">YES, SET UP NOW</string>
+    <string name="setup_workplace_no">NO, NOT NOW</string>
+    <string name="setup_workplace_later_title">Okay!</string>
+    <string name="setup_workplace_later_msg">If you want to add a workplace and Wi-Fi later, you can do so in settings.</string>
+
+    <string name="error_no_workplace_title">No workplace</string>
+    <string name="error_no_workplace_msg">You must add at least one workplace in settings before you can check in manually.</string>
+
+    <string name="report_no_workplaces_msg">You cannot create time reports without having a Workplace with registered times.</string>
+    <string name="report_no_logs">No logged sessions.</string>
+    <string name="btn_add_workplace">ADD</string>
 </resources>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ArbetsLoggPro</string>
+    <string name="app_name">Jobbzon</string>
     <string name="date_today">IDAG</string>
     <string name="date_yesterday">IGÅR</string>
     <string name="status_logged_time">LOGGAD TID</string>
@@ -25,6 +25,11 @@
     <string name="settings_save_button">SPARA ALLA INSTÄLLNINGAR</string>
 
     <string name="warning_outside_zone">VARNING: UTANFÖR ZONEN!</string>
+    <string name="status_logging_out_prefix">LOGGAR UT OM:</string>
+    <string name="status_manual_in">MANUELL IN</string>
+    <string name="status_auto_in">AUTO IN</string>
+    <string name="status_manual_out">MANUELL UT</string>
+    <string name="status_auto_out">AUTO UT</string>
     <string name="status_checked_out">Utcheckad</string>
     <string name="circle_in_time">IN: %1$s</string>
 
@@ -80,4 +85,24 @@
     <string name="nav_calendar">Kalender</string>
     <string name="nav_reports">Rapporter</string>
     <string name="nav_settings">Inställningar</string>
+
+    <string name="calendar_ongoing">Pågår</string>
+    <string name="calendar_lunch">LUNCH</string>
+    <string name="calendar_vacation">Ledig</string>
+    <string name="calendar_unknown_ssid">Okänd</string>
+    <string name="calendar_ongoing_status">PÅGÅR NÅ...</string>
+
+    <string name="setup_workplace_title">Välkommen till Jobbzon! 🏗️</string>
+    <string name="setup_workplace_msg">Du har inte lagt till någon arbetsplats eller Wi-Fi än. Vill du ställa in det nu så appen kan logga din tid automatiskt?</string>
+    <string name="setup_workplace_yes">JA, STÄLL IN NU</string>
+    <string name="setup_workplace_no">NEJ, INTE NU</string>
+    <string name="setup_workplace_later_title">Okej!</string>
+    <string name="setup_workplace_later_msg">Om du vill lägga till arbetsplats och Wi-Fi senare kan du göra det under inställningar.</string>
+
+    <string name="error_no_workplace_title">Ingen arbetsplats</string>
+    <string name="error_no_workplace_msg">Du måste lägga till minst en arbetsplats under inställningar innan du kan checka in manuellt.</string>
+
+    <string name="report_no_workplaces_msg">Du kan inte skapa tidrapporter utan att ha en Arbetsplats med registrerade tider.</string>
+    <string name="report_no_logs">Inga loggade pass.</string>
+    <string name="btn_add_workplace">LÄGG TILL</string>
 </resources>

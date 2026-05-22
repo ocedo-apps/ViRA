@@ -3,6 +3,7 @@ package com.dinatid.arbetslogg.ui
 import android.app.Application
 import android.content.Context
 import android.graphics.Color
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.dinatid.arbetslogg.R
@@ -43,25 +44,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 set(Calendar.MILLISECOND, 0)
             }
 
-            var dayMs = 0L
-            val dayLogs = logs.filter { it.timestamp in startOfDay.timeInMillis..(startOfDay.timeInMillis + 86400000) }.sortedBy { it.timestamp }
-            val lastLogOverall = logs.sortedBy { it.timestamp }.lastOrNull()
-
+            val lastLogOverall = logs.lastOrNull() // logs is already sorted by timestamp? 
+            // Wait, repository.getAllLogs() returns ORDER BY timestamp ASC according to the DAO.
+            // So logs is already sorted.
+            
             val isCurrentlyIn = lastLogOverall?.type == WorkLog.TYPE_IN
-            val lastInLog = logs.filter { it.type == WorkLog.TYPE_IN }.maxByOrNull { it.timestamp }
+            val lastInLog = logs.lastOrNull { it.type == WorkLog.TYPE_IN }
 
-            if (dayLogs.isNotEmpty()) {
-                var lastInTs = 0L; var isIn = false
-                for (l in dayLogs) {
-                    if (l.type == WorkLog.TYPE_IN && !isIn) { lastInTs = l.timestamp; isIn = true }
-                    else if (l.type.startsWith(WorkLog.TYPE_OUT) && isIn) { dayMs += (l.timestamp - lastInTs); isIn = false }
-                }
-                if (isIn && selectedDateOffset == 0) dayMs += (System.currentTimeMillis() - lastInTs)
-            } else if (isCurrentlyIn && selectedDateOffset == 0) {
-                dayMs += (System.currentTimeMillis() - startOfDay.timeInMillis)
-            }
-
-            val dayMin = (dayMs / 60000).toInt()
+            val dayMin = calculateWorkMinutes(logs, startOfDay.timeInMillis, startOfDay.timeInMillis + 86400000)
 
             val currentDateText = if (selectedDateOffset == 0) {
                 context.getString(R.string.date_today)
@@ -74,6 +64,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val nextDayAlpha = if (selectedDateOffset == 0) 0.3f else 1.0f
             val isNextDayClickable = selectedDateOffset != 0
 
+            val themeColor = Color.parseColor("#FCDEBB")
+            val greenColor = ContextCompat.getColor(context, R.color.status_green)
+
             var centerTimeText: String
             var centerTimeColor: Int
             var isCountdownVisible = false
@@ -81,29 +74,28 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             var currentWorkplaceText = ""
             var inTimeCircleText: String
             var statusTextStr = ""
-            var statusTextColor = Color.GRAY
+            var statusTextColor = themeColor
 
-            // Hämta eventuell helgdag för den valda dagen
             val holidayNameOnSelectedDay = HolidayManager.getHolidayName(cal)
 
-            if (wifiCountdownSeconds >= 0 && selectedDateOffset == 0) {
+            if (wifiCountdownSeconds >= 0 && selectedDateOffset == 0 && isCurrentlyIn) {
                 centerTimeText = String.format("%02d:%02d", wifiCountdownSeconds / 60, wifiCountdownSeconds % 60)
                 centerTimeColor = Color.parseColor("#F44336")
                 isCountdownVisible = true
-                currentSsidText = "LOGGAR UT OM:"
+                currentSsidText = context.getString(R.string.status_logging_out_prefix)
                 currentWorkplaceText = ""
                 inTimeCircleText = context.getString(R.string.empty_value)
                 statusTextStr = context.getString(R.string.warning_outside_zone)
                 statusTextColor = Color.parseColor("#F44336")
             } else {
                 centerTimeText = String.format("%02d:%02d", dayMin / 60, dayMin % 60)
-                centerTimeColor = Color.parseColor("#4CAF50")
+                centerTimeColor = themeColor
 
                 if (isCurrentlyIn && lastInLog != null) {
                     val rawSsid = lastInLog.ssid ?: ""
                     val isManual = rawSsid.startsWith("Manuell", ignoreCase = true)
 
-                    currentSsidText = if (isManual) "MANUELL IN" else "AUTO IN"
+                    currentSsidText = context.getString(if (isManual) R.string.status_manual_in else R.string.status_auto_in)
                     currentWorkplaceText = when {
                         rawSsid.contains("-") -> rawSsid.substringAfter("-").trim()
                         isManual -> ""
@@ -118,7 +110,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         val rawSsid = lastLogOverall.ssid ?: ""
 
                         val isManualOut = outType.contains("Manuell", ignoreCase = true)
-                        currentSsidText = if (isManualOut) "MANUELL UT" else "AUTO UT"
+                        currentSsidText = context.getString(if (isManualOut) R.string.status_manual_out else R.string.status_auto_out)
 
                         currentWorkplaceText = when {
                             rawSsid.contains("-") -> rawSsid.substringAfter("-").trim()
@@ -139,18 +131,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     val progressPercent = if (dailyGoalTotalMin > 0) (dayMin.toFloat() / dailyGoalTotalMin.toFloat() * 100f).toInt() else 0
 
                     statusTextStr = when {
-                        // --- HÄR BYTER VI UT GAMIFIERINGSTEXTEN VID HELGDAG ---
                         holidayNameOnSelectedDay != null && !isCurrentlyIn && dayMin == 0 -> {
                             val resId = HolidayManager.getGreetingResId(holidayNameOnSelectedDay)
                             if (resId != 0) {
                                 context.getString(resId)
                             } else {
-                                // Om en specifik hälsning saknas, formatera dynamiskt (t.ex. "GLAD ALLA HELGONS DAG!")
                                 context.getString(R.string.holiday_default_format, holidayNameOnSelectedDay.uppercase())
                             }
                         }
-
-                        // Dina vanliga gamifieringstexter rullar på som vanligt annars:
                         !isCurrentlyIn && dayMin == 0 -> context.getString(R.string.pepp_new_day)
                         isCurrentlyIn && progressPercent < 20 -> context.getString(R.string.pepp_opportunities)
                         isCurrentlyIn && progressPercent in 20..79 -> context.getString(R.string.pepp_lunch)
@@ -162,7 +150,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         !isCurrentlyIn && progressPercent >= 100 -> context.getString(R.string.pepp_good_work)
                         else -> if (isCurrentlyIn) context.getString(R.string.pepp_checked_in) else context.getString(R.string.pepp_checked_out)
                     }
-                    statusTextColor = if (isCurrentlyIn) Color.parseColor("#4CAF50") else Color.GRAY
+                    statusTextColor = themeColor
                 }
             }
 
@@ -174,31 +162,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val startOfMonth = (now.clone() as Calendar).apply { set(Calendar.DAY_OF_MONTH, 1) }
 
             var workDaysUntilToday = 0
-            val currentDayOfMonth = now.get(Calendar.DAY_OF_MONTH)
+            var totalWorkDaysInMonth = 0
+            val todayDayOfMonth = now.get(Calendar.DAY_OF_MONTH)
+            val monthDaysCount = now.getActualMaximum(Calendar.DAY_OF_MONTH)
             val checkCal = startOfMonth.clone() as Calendar
 
-            var totalWorkDaysInMonth = 0
-            val endOfMonth = (startOfMonth.clone() as Calendar).apply {
-                set(Calendar.DAY_OF_MONTH, getActualMaximum(Calendar.DAY_OF_MONTH))
-            }
-            val checkCalTotal = startOfMonth.clone() as Calendar
-
-            // --- NYTT: Räknar bort röda dagar från totala månadsmålet ---
-            while (checkCalTotal.before(endOfMonth) || checkCalTotal.timeInMillis == endOfMonth.timeInMillis) {
-                val dayOfWeek = checkCalTotal.get(Calendar.DAY_OF_WEEK)
-                val holiday = HolidayManager.getHolidayName(checkCalTotal)
-                if (dayOfWeek != Calendar.SATURDAY && dayOfWeek != Calendar.SUNDAY && holiday == null) {
-                    totalWorkDaysInMonth++
-                }
-                checkCalTotal.add(Calendar.DAY_OF_MONTH, 1)
-            }
-
-            // --- NYTT: Räknar bort röda dagar från förväntad tid fram till idag ---
-            for (i in 1..currentDayOfMonth) {
+            for (i in 1..monthDaysCount) {
                 val dayOfWeek = checkCal.get(Calendar.DAY_OF_WEEK)
                 val holiday = HolidayManager.getHolidayName(checkCal)
-                if (dayOfWeek != Calendar.SATURDAY && dayOfWeek != Calendar.SUNDAY && holiday == null) {
-                    workDaysUntilToday++
+                val isWorkDay = dayOfWeek != Calendar.SATURDAY && dayOfWeek != Calendar.SUNDAY && holiday == null
+                if (isWorkDay) {
+                    totalWorkDaysInMonth++
+                    if (i <= todayDayOfMonth) workDaysUntilToday++
                 }
                 checkCal.add(Calendar.DAY_OF_MONTH, 1)
             }
@@ -216,19 +191,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 workDaysUntilToday * dailyGoalAfterLunch
             }
 
-            var actualMs = 0L
-            val monthlyLogs = logs.filter { it.timestamp >= startOfMonth.timeInMillis }.sortedBy { it.timestamp }
-            var tempInTs = 0L
-            var isTrackingIn = false
-            for (log in monthlyLogs) {
-                if (log.type == WorkLog.TYPE_IN) { tempInTs = log.timestamp; isTrackingIn = true }
-                else if (log.type.startsWith(WorkLog.TYPE_OUT) && isTrackingIn) { actualMs += (log.timestamp - tempInTs); isTrackingIn = false }
-            }
-            if (isCurrentlyIn && lastInLog != null && lastInLog.timestamp >= startOfMonth.timeInMillis) {
-                actualMs += (System.currentTimeMillis() - lastInLog.timestamp)
-            }
-
-            val actualMin = (actualMs / 60000).toInt()
+            val actualMin = calculateWorkMinutes(logs, startOfMonth.timeInMillis, System.currentTimeMillis())
             val balance = actualMin - expectedUntilToday
 
             val monthlyProgressBarProgress = if (totalGoalMinForMonth > 0) (actualMin.toFloat() / totalGoalMinForMonth.toFloat() * 100f).toInt() else 0
@@ -254,7 +217,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     else -> context.getString(R.string.toggle_out_default)
                 }
             }
-            val toggleStatusColor = if (isCurrentlyIn) Color.parseColor("#4CAF50") else Color.parseColor("#757575")
+            val toggleStatusColor = themeColor
 
             _uiState.value = MainUiState(
                 currentDate = currentDateText,
@@ -282,7 +245,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun handleManualToggle() {
+    // HÄR VAR FELET: Funktionen tar nu emot 'chosenWorkplace' på rätt sätt!
+    fun handleManualToggle(chosenWorkplace: String?) {
         viewModelScope.launch {
             val lastLog = repository.getLastLog()
             val isCurrentlyIn = lastLog?.type == WorkLog.TYPE_IN
@@ -299,7 +263,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 val inTime = lastLog.timestamp
                 val ssid = lastLog.ssid ?: "Manuell"
 
-                insertManualLogoutWithMidnightSplit(inTime, now, ssid)
+                repository.insertLogoutWithMidnightSplit(inTime, now, ssid, true)
                 repository.setManualOverride(true)
             } else {
                 if (lastLog != null && lastLog.type.startsWith(WorkLog.TYPE_OUT)) {
@@ -312,40 +276,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
 
-                var workplaceName = "Manuell"
-                val prefs = context.getSharedPreferences("arbetslogg_prefs", Context.MODE_PRIVATE)
-                val savedData = prefs.getString("workplaces_structure", "") ?: ""
-
-                if (savedData.isNotEmpty()) {
-                    val blocks = savedData.split("|")
-                    var matchedName: String? = null
-
-                    try {
-                        val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as android.net.wifi.WifiManager
-                        val info = wifiManager.connectionInfo
-                        val currentSsid = info?.ssid?.replace("\"", "")?.trim() ?: ""
-
-                        for (block in blocks) {
-                            val parts = block.split(":")
-                            if (parts.size == 2) {
-                                val name = parts[0]
-                                val ssids = parts[1].split(",").map { it.trim() }
-                                if (currentSsid.isNotEmpty() && ssids.any { it.equals(currentSsid, ignoreCase = true) }) {
-                                    matchedName = name
-                                    break
-                                }
-                            }
-                        }
-                    } catch (e: Exception) {}
-
-                    if (matchedName == null && blocks.size == 1) {
-                        val parts = blocks[0].split(":")
-                        if (parts.size == 2) matchedName = parts[0]
-                    }
-
-                    if (matchedName != null) {
-                        workplaceName = "Manuell - $matchedName"
-                    }
+                val workplaceName = if (!chosenWorkplace.isNullOrEmpty()) {
+                    "Manuell - $chosenWorkplace"
+                } else {
+                    "Manuell"
                 }
 
                 repository.insertLog(WorkLog(type = WorkLog.TYPE_IN, timestamp = now, ssid = workplaceName))
@@ -355,47 +289,36 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private suspend fun insertManualLogoutWithMidnightSplit(inTime: Long, outTime: Long, ssid: String) {
-        val inCal = Calendar.getInstance().apply { timeInMillis = inTime }
-        val outCal = Calendar.getInstance().apply { timeInMillis = outTime }
+    private fun calculateWorkMinutes(allLogs: List<WorkLog>, startTs: Long, endTs: Long): Int {
+        val rangeLogs = allLogs.filter { it.timestamp in startTs..endTs }
+        val lastLogBefore = allLogs.lastOrNull { it.timestamp < startTs }
 
-        if (inCal.get(Calendar.YEAR) == outCal.get(Calendar.YEAR) &&
-            inCal.get(Calendar.DAY_OF_YEAR) == outCal.get(Calendar.DAY_OF_YEAR)) {
-            repository.insertLog(WorkLog(type = WorkLog.TYPE_OUT_MANUAL, timestamp = outTime, ssid = ssid))
-        } else {
-            val currentStart = inCal.clone() as Calendar
-            while (currentStart.get(Calendar.YEAR) < outCal.get(Calendar.YEAR) ||
-                (currentStart.get(Calendar.YEAR) == outCal.get(Calendar.YEAR) &&
-                        currentStart.get(Calendar.DAY_OF_YEAR) < outCal.get(Calendar.DAY_OF_YEAR))) {
+        var isIn = lastLogBefore?.type == WorkLog.TYPE_IN
+        var currentInTs = if (isIn) startTs else 0L
+        var totalMin = 0
 
-                val endOfDay = (currentStart.clone() as Calendar).apply {
-                    set(Calendar.HOUR_OF_DAY, 23)
-                    set(Calendar.MINUTE, 59)
-                    set(Calendar.SECOND, 59)
-                    set(Calendar.MILLISECOND, 999)
-                }
-                repository.insertLog(WorkLog(type = WorkLog.TYPE_OUT_MANUAL, timestamp = endOfDay.timeInMillis, ssid = ssid))
-
-                currentStart.add(Calendar.DAY_OF_YEAR, 1)
-                currentStart.apply {
-                    set(Calendar.HOUR_OF_DAY, 0)
-                    set(Calendar.MINUTE, 0)
-                    set(Calendar.SECOND, 0)
-                    set(Calendar.MILLISECOND, 0)
-                }
-                repository.insertLog(WorkLog(type = WorkLog.TYPE_IN, timestamp = currentStart.timeInMillis, ssid = ssid))
+        for (log in rangeLogs) {
+            if (log.type == WorkLog.TYPE_IN && !isIn) {
+                currentInTs = log.timestamp
+                isIn = true
+            } else if (log.type.startsWith(WorkLog.TYPE_OUT) && isIn) {
+                totalMin += Math.round((log.timestamp - currentInTs).toDouble() / 60000.0).toInt()
+                isIn = false
             }
-            repository.insertLog(WorkLog(type = WorkLog.TYPE_OUT_MANUAL, timestamp = outTime, ssid = ssid))
         }
+
+        if (isIn) {
+            val effectiveEnd = Math.min(System.currentTimeMillis(), endTs)
+            if (effectiveEnd > currentInTs) {
+                totalMin += Math.round((effectiveEnd - currentInTs).toDouble() / 60000.0).toInt()
+            }
+        }
+        return totalMin
     }
 }
 
-// ==========================================
-// --- NYTT: AUTOMATISK HELGDAGSMOTOR ---
-// ==========================================
 object HolidayManager {
 
-    // Räknar ut påskdagen matematiskt för valfritt år (Anonymous Gregorian Algorithm)
     private fun getEasterSunday(year: Int): Calendar {
         val a = year % 19
         val b = year / 100
@@ -423,14 +346,12 @@ object HolidayManager {
         }
     }
 
-    // Returnerar namnet på helgdagen, eller null om det är en vanlig dag
     fun getHolidayName(cal: Calendar): String? {
         val year = cal.get(Calendar.YEAR)
-        val month = cal.get(Calendar.MONTH) + 1 // Jan = 1, Dec = 12
+        val month = cal.get(Calendar.MONTH) + 1
         val day = cal.get(Calendar.DAY_OF_MONTH)
         val dayOfWeek = cal.get(Calendar.DAY_OF_WEEK)
 
-        // 1. Fasta röda dagar samt de tre stora aftnarna
         if (month == 1 && day == 1) return "Nyårsdagen"
         if (month == 1 && day == 6) return "Trettondedag jul"
         if (month == 5 && day == 1) return "Första maj"
@@ -440,7 +361,6 @@ object HolidayManager {
         if (month == 12 && day == 26) return "Annandag jul"
         if (month == 12 && day == 31) return "Nyårsafton"
 
-        // 2. Rörliga dagar baserade på Påsken
         val easter = getEasterSunday(year)
         val checkMs = Calendar.getInstance().apply {
             timeInMillis = cal.timeInMillis
@@ -450,32 +370,23 @@ object HolidayManager {
             set(Calendar.MILLISECOND, 0)
         }.timeInMillis
 
-        // Långfredagen (Påsk - 2 dagar)
         val goodFriday = (easter.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, -2) }
         if (checkMs == goodFriday.timeInMillis) return "Långfredagen"
 
-        // Påskdagen
         if (checkMs == easter.timeInMillis) return "Påskdagen"
 
-        // Annandag påsk (Påsk + 1 dag)
         val easterMonday = (easter.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, 1) }
         if (checkMs == easterMonday.timeInMillis) return "Annandag påsk"
 
-        // Kristi himmelsfärd (Påsk + 39 dagar)
         val ascension = (easter.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, 39) }
         if (checkMs == ascension.timeInMillis) return "Kristi himmelsfärdsdag"
 
-        // 3. Övriga rörliga svenska helgmarkerade dagar
-        // Midsommarafton: Fredagen mellan 19 juni och 25 juni
         if (month == 6 && dayOfWeek == Calendar.FRIDAY && day in 19..25) return "Midsommarafton"
-        // Midsommardagen: Lördagen mellan 20 juni och 26 juni
         if (month == 6 && dayOfWeek == Calendar.SATURDAY && day in 20..26) return "Midsommardagen"
 
         return null
     }
 
-    // Mappar helgdag till dina unika och peppande hälsningar
-// Mappar helgdag till rätt textresurs i strings.xml
     fun getGreetingResId(holidayName: String): Int {
         return when (holidayName) {
             "Nyårsdagen" -> R.string.holiday_nyarsdagen
@@ -488,7 +399,7 @@ object HolidayManager {
             "Midsommarafton", "Midsommardagen" -> R.string.holiday_midsommar
             "Julafton", "Juldagen", "Annandag jul" -> R.string.holiday_jul
             "Nyårsafton" -> R.string.holiday_nyarsafton
-            else -> 0 // 0 betyder att vi använder fallback-formatet
+            else -> 0
         }
     }
 }

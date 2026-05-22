@@ -21,4 +21,5 @@
     <color name="dialog_hint_dark">#80212121</color>
 
     <color name="calendar_weekend_bg">#10000000</color>
+    <color name="status_green">#4CAF50</color>
 </resources>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ArbeidsLoggPro</string>
+    <string name="app_name">Jobbzon</string>
     <string name="date_today">I DAG</string>
     <string name="date_yesterday">I GÅR</string>
     <string name="status_logged_time">LOGGET TID</string>
@@ -17,7 +17,7 @@
     <string name="settings_consultant_goal_title">Konsulenttimer, mål per måned</string>
     <string name="settings_consultant_goal_hint">F.eks. 160</string>
     <string name="settings_workplaces_title">MINE ARBEIDSPLASSER</string>
-    <string name="settings_workplace_name_hint">F.eks. Jerven eller Hjemmet</string>
+    <string name="settings_workplace_name_hint">F.eks. Kontoret eller Butikken</string>
     <string name="settings_defaults_title">STANDARDTIDER &amp; MÅL</string>
     <string name="settings_daily_goal_title">Dagsmål (timer)</string>
     <string name="settings_lunch_minutes_title">Standard lunsjavdrag (minutter)</string>
@@ -80,4 +80,24 @@
     <string name="nav_calendar">Kalender</string>
     <string name="nav_reports">Rapporter</string>
     <string name="nav_settings">Innstillinger</string>
+
+    <string name="calendar_ongoing">Pågår</string>
+    <string name="calendar_lunch">LUNSJ</string>
+    <string name="calendar_vacation">Ledig</string>
+    <string name="calendar_unknown_ssid">Ukjent</string>
+    <string name="calendar_ongoing_status">PÅGÅR NÅ&#8230;</string>
+
+    <string name="setup_workplace_title">Velkommen till Jobbzon! 🏗️</string>
+    <string name="setup_workplace_msg">Du har ikke lagt till noen arbeidsplass eller Wi-Fi ennå. Vil du sette det opp nå så appen kan logge tiden din automatisk?</string>
+    <string name="setup_workplace_yes">JA, SETT OPP NÅ</string>
+    <string name="setup_workplace_no">NEI, IKKE NÅ</string>
+    <string name="setup_workplace_later_title">Okei!</string>
+    <string name="setup_workplace_later_msg">Hvis du vil legge till arbeidsplass og Wi-Fi senere, kan du gjøre det under innstillinger.</string>
+
+    <string name="error_no_workplace_title">Ingen arbeidsplass</string>
+    <string name="error_no_workplace_msg">Du må legge till minst én arbeidsplass under innstillinger før du kan sjekke inn manuelt.</string>
+
+    <string name="report_no_workplaces_msg">Du kan ikke opprette timelister uten å ha en arbeidsplass med registrerte tider.</string>
+    <string name="report_no_logs">Ingen loggførte økter.</string>
+    <string name="btn_add_workplace">LEGG TIL</string>
 </resources>
