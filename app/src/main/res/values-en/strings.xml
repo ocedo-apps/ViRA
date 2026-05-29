@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Jobbzon</string>
+    <string name="app_name">ViRA</string>
     <string name="date_today">TODAY</string>
     <string name="date_yesterday">YESTERDAY</string>
     <string name="status_logged_time">LOGGED TIME</string>
@@ -87,7 +87,7 @@
     <string name="calendar_unknown_ssid">Unknown</string>
     <string name="calendar_ongoing_status">ONGOING NOW&#8230;</string>
 
-    <string name="setup_workplace_title">Welcome to Jobbzon! 🏗️</string>
+    <string name="setup_workplace_title">Welcome to ViRA! 🏗️</string>
     <string name="setup_workplace_msg">You haven\'t added a workplace or Wi-Fi yet. Would you like to set it up now so the app can log your time automatically?</string>
     <string name="setup_workplace_yes">YES, SET UP NOW</string>
     <string name="setup_workplace_no">NO, NOT NOW</string>
@@ -100,4 +100,24 @@
     <string name="report_no_workplaces_msg">You cannot create time reports without having a Workplace with registered times.</string>
     <string name="report_no_logs">No logged sessions.</string>
     <string name="btn_add_workplace">ADD</string>
+
+    <string name="warning_permission_title">Permissions missing! ⚠️</string>
+    <string name="warning_permission_location">The app needs \"Location\" to see your Wi-Fi and log time automatically.</string>
+    <string name="warning_permission_notifications">The app needs \"Notifications\" to show status and send reminders.</string>
+    <string name="warning_permission_both">The app needs both \"Location\" and \"Notifications\" permissions to function correctly.</string>
+    <string name="btn_fix_permissions">FIX NOW</string>
+
+    <string name="warning_auto_revoke_title">Protect app permissions 🛡️</string>
+    <string name="warning_auto_revoke_msg">Android may automatically revoke app permissions if you don\'t use it for a while. To ensure stable Wi-Fi logging, you should disable this.</string>
+    <string name="btn_fix_auto_revoke">CHANGE SETTING</string>
+
+    <string name="reminder_login_title">Forgot to log in? 🧐</string>
+    <string name="reminder_login_msg">It\'s %1$s and you are usually here by now. Want to log in?</string>
+    <string name="reminder_logout_title">Still working? 🌙</string>
+    <string name="reminder_logout_msg">You usually head home around this time. Don\'t forget to check out!</string>
+    <string name="reminder_lunch_msg">Time for lunch? You usually take a break around this time.</string>
+
+    <string name="settings_theme_title">LOOK &amp; THEME</string>
+    <string name="theme_classic">CLASSIC (ORANGE)</string>
+    <string name="theme_modern">MODERN (EXPERIMENTAL)</string>
 </resources>

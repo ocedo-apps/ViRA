@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.ArbetsLoggPro" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.ViRA" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:fontFamily">@font/asap_light</item>
@@ -9,33 +9,129 @@
         <item name="colorAccent">@color/accent_orange</item>
         <item name="android:statusBarColor">@color/sunset_start</item>
         <item name="android:windowBackground">@drawable/bg_sunset_gradient</item>
+        <item name="colorSurface">@color/card_warm_bg</item>
+        <!-- Custom Attrs -->
+        <item name="mainBackground">@drawable/bg_sunset_gradient</item>
+        <item name="bottomNavBackground">@drawable/bg_bottom_nav</item>
+        <item name="titleTextColor">@color/sunset_text_main</item>
+        <item name="spinnerTextColor">@color/text_main</item>
+        <item name="secondaryTextColorCustom">@color/sunset_text_main</item>
+        <item name="accentColorCustom">@color/sunset_orange</item>
+        <item name="cardHeaderTextColor">@color/text_dark_gray</item>
+        <item name="arrowTintColor">@color/sunset_orange</item>
+        <item name="sectionHeaderTextColor">@color/text_main</item>
+        <item name="loggedTimeColor">@color/sunset_orange</item>
+        <item name="mutedTextColorOnSurface">#424242</item>
+        <item name="buttonTextActiveColor">@color/sunset_creme</item>
+        <item name="buttonTextInactiveColor">@color/sunset_text_main</item>
+        <item name="calendarHeaderColor">@color/text_main</item>
+        <item name="calendarArrowColor">@color/text_main</item>
+        <item name="calendarWeekdayColor">@color/text_muted</item>
+
+        <item name="fontRegular">@font/asap_light</item>
+        <item name="fontBold">@font/asap_black</item>
+        <item name="fontSemiBold">@font/asap_semibold</item>
+        <item name="fontLight">@font/asap_light</item>
+        <item name="android:popupBackground">@color/card_warm_bg</item>
+        <item name="materialAlertDialogTheme">@style/ViRADialogTheme</item>
     </style>
 
-    <style name="JobbzonDialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+    <style name="Theme.ViRA.Modern" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <!-- MODERN FONT -->
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="colorPrimary">@color/modern_accent_orange</item>
+        <item name="colorSecondary">@color/modern_accent_blue</item>
+        <item name="colorAccent">@color/modern_accent_blue</item>
+        <item name="android:statusBarColor">#000000</item>
+        <item name="android:windowBackground">@color/modern_bg</item>
+        <item name="colorSurface">@color/modern_card_bg</item>
+        <!-- Custom Attrs -->
+        <item name="android:textColorPrimary">@color/modern_text_primary</item>
+        <item name="android:textColorSecondary">@color/modern_text_secondary</item>
+
+        <!-- Custom Attrs -->
+        <item name="mainBackground">@color/modern_bg</item>
+        <item name="bottomNavBackground">@drawable/bg_bottom_nav_modern</item>
+        <item name="titleTextColor">@color/modern_accent_orange</item>
+        <item name="spinnerTextColor">@color/modern_text_primary</item>
+        <item name="secondaryTextColorCustom">@color/modern_text_secondary</item>
+        <item name="accentColorCustom">@color/modern_accent_orange</item>
+        <item name="cardHeaderTextColor">@color/modern_accent_orange</item>
+        <item name="arrowTintColor">@color/sunset_orange</item>
+        <item name="sectionHeaderTextColor">@color/modern_accent_orange</item>
+        <item name="loggedTimeColor">@color/modern_accent_orange</item>
+        <item name="mutedTextColorOnSurface">@color/modern_text_secondary</item>
+        <item name="buttonTextActiveColor">@color/modern_text_primary</item>
+        <item name="buttonTextInactiveColor">@color/modern_text_secondary</item>
+        <item name="calendarHeaderColor">@color/modern_accent_orange</item>
+        <item name="calendarArrowColor">@color/sunset_orange</item>
+        <item name="calendarWeekdayColor">@color/modern_text_secondary</item>
+
+        <item name="fontRegular">@font/inter</item>
+        <item name="fontBold">@font/inter</item>
+        <item name="fontSemiBold">@font/inter</item>
+        <item name="fontLight">@font/inter_light</item>
+        <item name="android:popupBackground">@color/modern_card_bg</item>
+        <item name="android:colorBackground">@color/modern_bg</item>
+        <item name="materialAlertDialogTheme">@style/ViRADialogTheme.Modern</item>
+    </style>
+
+    <style name="ViRADialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="colorSurface">#D9FCDEBB</item>
-        <item name="shapeAppearanceOverlay">@style/JobbzonDialogCorners</item>
+        <item name="colorOnSurface">#212121</item>
+        <item name="shapeAppearanceOverlay">@style/ViRADialogCorners</item>
 
-        <item name="materialAlertDialogTitleTextStyle">@style/JobbzonDialogTitleText</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/ViRADialogTitleText</item>
 
-        <item name="buttonBarPositiveButtonStyle">@style/JobbzonDialogButton</item>
-        <item name="buttonBarNegativeButtonStyle">@style/JobbzonDialogButton</item>
+        <item name="buttonBarPositiveButtonStyle">@style/ViRADialogButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/ViRADialogButton</item>
 
         <item name="android:textColorPrimary">#212121</item>
         <item name="android:textColorSecondary">#66212121</item>
     </style>
 
-    <style name="JobbzonDialogCorners">
+    <style name="ViRADialogTheme.Modern" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="colorSurface">@color/modern_card_bg</item>
+        <item name="colorOnSurface">@color/modern_text_primary</item>
+        <item name="shapeAppearanceOverlay">@style/ViRADialogCorners</item>
+
+        <item name="materialAlertDialogTitleTextStyle">@style/ViRADialogTitleText.Modern</item>
+
+        <item name="buttonBarPositiveButtonStyle">@style/ViRADialogButton.Modern</item>
+        <item name="buttonBarNegativeButtonStyle">@style/ViRADialogButton.Modern</item>
+
+        <item name="android:textColorPrimary">@color/modern_text_primary</item>
+        <item name="android:textColorSecondary">@color/modern_text_secondary</item>
+    </style>
+
+    <style name="ViRADialogTitleText.Modern" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:fontFamily">?attr/fontBold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/modern_accent_orange</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="ViRADialogButton.Modern" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/modern_accent_orange</item>
+        <item name="android:fontFamily">?attr/fontBold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+
+    <style name="ViRADialogCorners">
         <item name="cornerSize">16dp</item>
     </style>
 
-    <style name="JobbzonDialogTitleText" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+    <style name="ViRADialogTitleText" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
         <item name="android:fontFamily">@font/asap_black</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:textColor">#B44305</item>
         <item name="android:textSize">22sp</item>
     </style>
 
-    <style name="JobbzonDialogButton" parent="Widget.MaterialComponents.Button.TextButton">
+    <style name="ViRADialogButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="backgroundTint">#B44305</item>
 
         <item name="android:textColor">#FCDEBB</item>

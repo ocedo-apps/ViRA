@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ArbetsLoggPro"
+rootProject.name = "ViRA"
 include(":app")

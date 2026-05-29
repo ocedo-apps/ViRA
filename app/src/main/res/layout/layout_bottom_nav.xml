@@ -2,11 +2,13 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottomNav"
     android:layout_width="match_parent"
     android:layout_height="68dp"
-    android:background="@drawable/bg_bottom_nav"
+    android:background="?attr/bottomNavBackground"
     android:orientation="horizontal"
+    android:baselineAligned="false"
     android:weightSum="4">
 
     <LinearLayout
@@ -25,15 +27,17 @@
             android:layout_width="22dp"
             android:layout_height="22dp"
             android:src="@drawable/outline_calendar_apps_script_24"
-            app:tint="@color/sunset_text_main" />
+            app:tint="@color/sunset_text_main"
+            android:contentDescription="Idag" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:fontFamily="@font/asap_light"
+            app:fontFamily="?attr/fontRegular"
             android:text="@string/nav_dashboard"
             android:textColor="@color/sunset_text_main"
-            android:textSize="11sp" />
+            android:textSize="11sp"
+            tools:ignore="UnusedAttribute" />
     </LinearLayout>
 
     <LinearLayout
@@ -52,15 +56,17 @@
             android:layout_width="22dp"
             android:layout_height="22dp"
             android:src="@drawable/outline_calendar_clock_24"
-            app:tint="@color/sunset_text_main" />
+            app:tint="@color/sunset_text_main"
+            android:contentDescription="Kalender" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:fontFamily="@font/asap_light"
+            app:fontFamily="?attr/fontRegular"
             android:text="@string/nav_calendar"
             android:textColor="@color/sunset_text_main"
-            android:textSize="11sp" />
+            android:textSize="11sp"
+            tools:ignore="UnusedAttribute" />
     </LinearLayout>
 
     <LinearLayout
@@ -79,15 +85,17 @@
             android:layout_width="22dp"
             android:layout_height="22dp"
             android:src="@drawable/outline_analytics_24"
-            app:tint="@color/sunset_text_main" />
+            app:tint="@color/sunset_text_main"
+            android:contentDescription="Rapporter" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:fontFamily="@font/asap_light"
+            app:fontFamily="?attr/fontRegular"
             android:text="@string/nav_reports"
             android:textColor="@color/sunset_text_main"
-            android:textSize="11sp" />
+            android:textSize="11sp"
+            tools:ignore="UnusedAttribute" />
     </LinearLayout>
 
     <LinearLayout
@@ -106,14 +114,16 @@
             android:layout_width="22dp"
             android:layout_height="22dp"
             android:src="@drawable/ic_settings"
-            app:tint="@color/sunset_text_main" />
+            app:tint="@color/sunset_text_main"
+            android:contentDescription="Inställningar" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:fontFamily="@font/asap_light"
+            app:fontFamily="?attr/fontRegular"
             android:text="@string/nav_settings"
             android:textColor="@color/sunset_text_main"
-            android:textSize="11sp" />
+            android:textSize="11sp"
+            tools:ignore="UnusedAttribute" />
     </LinearLayout>
 </LinearLayout>

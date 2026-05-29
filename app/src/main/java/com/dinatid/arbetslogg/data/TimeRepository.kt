@@ -6,14 +6,41 @@ import com.dinatid.arbetslogg.AppDatabase
 import com.dinatid.arbetslogg.DailyNote
 import com.dinatid.arbetslogg.WorkLog
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.withContext
 import java.util.Calendar
 
-class TimeRepository(private val context: Context) {
+sealed class AppEvent {
+    object RefreshData : AppEvent()
+    data class CountdownUpdate(val secondsLeft: Int) : AppEvent()
+}
+
+class TimeRepository private constructor(private val context: Context) {
 
     private val database = AppDatabase.getDatabase(context)
-    private val dailyNoteDao = database.dailyNoteDao() // --- NY: Hämtar vår nya DAO för kommentarer ---
+    private val dailyNoteDao = database.dailyNoteDao() 
     private val sharedPrefs: SharedPreferences = context.getSharedPreferences("arbetslogg_prefs", Context.MODE_PRIVATE)
+
+    private val _events = MutableSharedFlow<AppEvent>(extraBufferCapacity = 64)
+    val events = _events.asSharedFlow()
+
+    suspend fun emitEvent(event: AppEvent) {
+        _events.emit(event)
+    }
+
+    companion object {
+        @Volatile
+        private var INSTANCE: TimeRepository? = null
+
+        fun getInstance(context: Context): TimeRepository {
+            return INSTANCE ?: synchronized(this) {
+                val instance = TimeRepository(context.applicationContext)
+                INSTANCE = instance
+                instance
+            }
+        }
+    }
 
     // --- DATABASHANTERING (Måste vara suspend och köras på bakgrundstrådar) ---
 
@@ -108,12 +135,28 @@ class TimeRepository(private val context: Context) {
         sharedPrefs.edit().putBoolean("is_wifi_connected", connected).apply()
     }
 
+    fun getCurrentSsid(): String? {
+        return sharedPrefs.getString("current_ssid", null)
+    }
+
+    fun setCurrentSsid(ssid: String?) {
+        sharedPrefs.edit().putString("current_ssid", ssid).apply()
+    }
+
     fun isManualOverride(): Boolean {
         return sharedPrefs.getBoolean("manual_override", false)
     }
 
     fun setManualOverride(active: Boolean) {
         sharedPrefs.edit().putBoolean("manual_override", active).apply()
+    }
+
+    fun getManualOverrideSsid(): String? {
+        return sharedPrefs.getString("manual_override_ssid", null)
+    }
+
+    fun setManualOverrideSsid(ssid: String?) {
+        sharedPrefs.edit().putString("manual_override_ssid", ssid).apply()
     }
 
     // --- DYNAMISKA INSTÄLLNINGAR ---
@@ -158,5 +201,18 @@ class TimeRepository(private val context: Context) {
 
     fun setDeclinedWorkplaceSetup(declined: Boolean) {
         sharedPrefs.edit().putBoolean("declined_workplace_setup", declined).apply()
+    }
+
+    fun getAppTheme(): Int {
+        return sharedPrefs.getInt("app_theme", 0) // 0 = Classic, 1 = Modern
+    }
+
+    fun setAppTheme(theme: Int) {
+        sharedPrefs.edit().putInt("app_theme", theme).apply()
+    }
+
+    suspend fun getUserPattern(): UserPattern = withContext(Dispatchers.IO) {
+        val logs = getAllLogs()
+        PatternManager(logs).calculatePattern()
     }
 }

@@ -1,24 +1,20 @@
-# JobbZon 🚀
+# ViRA 🚀
 
-JobbZon is a smart, automated time tracking and work log application for Android. Designed for both daily employees and independent consultants, it takes the hassle out of time reporting by intelligently managing your check-ins and check-outs.
+ViRA is a smart, automated time tracking and work log application for Android. Designed for both employees and consultants, it simplifies work-life balance by handling your logs automatically via Wi-Fi connectivity and providing intelligent assistance.
 
-## ✨ Features
+## Key Features
 
-- **🤖 Smart Automation:** Automatically tracks your work hours by detecting your workplace Wi-Fi networks.
-- **📅 Calendar Integration:** Syncs your completed work shifts directly to your phone's native calendar (Google Calendar, Samsung Calendar, Outlook, etc.) automatically upon checking out.
-- **💼 Dual Core Modes:** Tailored modes for **Employees** (focusing on daily goals and lunch deductions) and **Consultants** (focusing on monthly hour targets).
-- **📍 Workplace Management:** Easily configure multiple workplaces (e.g., "Office", "Home") with individual settings.
-- **🎯 Custom Goals & Rounding:** Set your daily/monthly targets and choose how the app rounds your logs (e.g., nearest 15 minutes).
-- **📊 Dynamic Reporting:** Visual weekly and monthly overviews of your logged time with export capabilities.
-- **🌐 Localized:** Full multi-language support for **English**, **Swedish**, and **Norwegian**.
+- **Automated Logging:** Automatic IN/OUT registration based on office Wi-Fi.
+- **SmartHelp 2.0:** Gap detection for appointments, lunch reminders, and pattern learning.
+- **Visual Analytics:** Beautiful, animated bar charts showing your weekly work hours.
+- **Calendar Integration:** See holidays, external events, and daily notes in a clean monthly view.
+- **Automated Reports:** Monthly CSV exports generated automatically for all your clients.
+- **Secure Backups:** Easily export your database to any cloud-synced folder (Nextcloud, Drive, etc.).
+- **Modern UI:** Choose between Classic (Warm) and Modern (Dark/Orange) themes.
 
-## 🛠️ Tech Stack
+## Technical Highlights
 
-- **Language:** 100% Kotlin
-- **Database:** Room DB (for secure, local offline data persistence)
-- **Architecture:** MVVM (Model-View-ViewModel) with Repository pattern
-- **UI Components:** Modern Android Material Design, RecyclerViews with multiple view types (Headers/Shifts)
-
-## 📄 License
-
-This project is licensed under the terms specified in the [LICENSE](LICENSE) file.
+- **Architecture:** MVVM with Kotlin Flows for real-time UI updates.
+- **Storage:** Room Database with comprehensive migration support.
+- **Background Tasks:** WorkManager for reliable periodic checks and automated exports.
+- **UI Components:** Modern Android Material Design with custom animated views.

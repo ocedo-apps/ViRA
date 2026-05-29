@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Jobbzon</string>
+    <string name="app_name">ViRA</string>
     <string name="date_today">IDAG</string>
     <string name="date_yesterday">IGÅR</string>
     <string name="status_logged_time">LOGGAD TID</string>
@@ -20,7 +20,9 @@
     <string name="settings_workplace_name_hint">T.ex. Järven eller Hemmet</string>
     <string name="settings_defaults_title">STANDARDTIDER &amp; MÅL</string>
     <string name="settings_daily_goal_title">Dagsmål (timmar)</string>
+    <string name="settings_daily_goal_hint">T.ex. 8</string>
     <string name="settings_lunch_minutes_title">Standard lunchavdrag (minuter)</string>
+    <string name="settings_lunch_minutes_hint">T.ex. 30</string>
     <string name="settings_rounding_title">Tidsavrundning</string>
     <string name="settings_save_button">SPARA ALLA INSTÄLLNINGAR</string>
 
@@ -92,7 +94,7 @@
     <string name="calendar_unknown_ssid">Okänd</string>
     <string name="calendar_ongoing_status">PÅGÅR NÅ...</string>
 
-    <string name="setup_workplace_title">Välkommen till Jobbzon! 🏗️</string>
+    <string name="setup_workplace_title">Välkommen till ViRA! 🏗️</string>
     <string name="setup_workplace_msg">Du har inte lagt till någon arbetsplats eller Wi-Fi än. Vill du ställa in det nu så appen kan logga din tid automatiskt?</string>
     <string name="setup_workplace_yes">JA, STÄLL IN NU</string>
     <string name="setup_workplace_no">NEJ, INTE NU</string>
@@ -105,4 +107,24 @@
     <string name="report_no_workplaces_msg">Du kan inte skapa tidrapporter utan att ha en Arbetsplats med registrerade tider.</string>
     <string name="report_no_logs">Inga loggade pass.</string>
     <string name="btn_add_workplace">LÄGG TILL</string>
+
+    <string name="warning_permission_title">Behörigheter saknas! ⚠️</string>
+    <string name="warning_permission_location">Appen behöver \"Plats\" för att kunna se ditt Wi-Fi och logga tid automatiskt.</string>
+    <string name="warning_permission_notifications">Appen behöver \"Aviseringar\" för att visa status och skicka påminnelser.</string>
+    <string name="warning_permission_both">Appen behöver behörighet för både \"Plats\" och \"Aviseringar\" för att fungera korrekt.</string>
+    <string name="btn_fix_permissions">ÅTGÄRDA NU</string>
+
+    <string name="warning_auto_revoke_title">Skydda appens behörigheter 🛡️</string>
+    <string name="warning_auto_revoke_msg">Android kan automatiskt stänga av appens behörigheter om du inte använder den på ett tag. För att Wi-Fi-inloggningen ska fungera stabilt bör du inaktivera detta.</string>
+    <string name="btn_fix_auto_revoke">ÄNDRA INSTÄLLNING</string>
+
+    <string name="reminder_login_title">Glömt logga in? 🧐</string>
+    <string name="reminder_login_msg">Klockan är %1$s och du brukar vara på plats nu. Vill du logga in?</string>
+    <string name="reminder_logout_title">Jobbar du fortfarande? 🌙</string>
+    <string name="reminder_logout_msg">Du brukar gå hem vid den här tiden. Glöm inte att stämpla ut!</string>
+    <string name="reminder_lunch_msg">Dags för lunch? Du brukar ta rast vid den här tiden.</string>
+
+    <string name="settings_theme_title">UTSEENDE &amp; TEMA</string>
+    <string name="theme_classic">KLASSISK (ORANGE)</string>
+    <string name="theme_modern">MODERN (EXPERIMENTELL)</string>
 </resources>

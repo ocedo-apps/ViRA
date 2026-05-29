@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Jobbzon</string>
+    <string name="app_name">ViRA</string>
     <string name="date_today">I DAG</string>
     <string name="date_yesterday">I GÅR</string>
     <string name="status_logged_time">LOGGET TID</string>
@@ -87,7 +87,7 @@
     <string name="calendar_unknown_ssid">Ukjent</string>
     <string name="calendar_ongoing_status">PÅGÅR NÅ&#8230;</string>
 
-    <string name="setup_workplace_title">Velkommen till Jobbzon! 🏗️</string>
+    <string name="setup_workplace_title">Velkommen till ViRA! 🏗️</string>
     <string name="setup_workplace_msg">Du har ikke lagt till noen arbeidsplass eller Wi-Fi ennå. Vil du sette det opp nå så appen kan logge tiden din automatisk?</string>
     <string name="setup_workplace_yes">JA, SETT OPP NÅ</string>
     <string name="setup_workplace_no">NEI, IKKE NÅ</string>
@@ -100,4 +100,24 @@
     <string name="report_no_workplaces_msg">Du kan ikke opprette timelister uten å ha en arbeidsplass med registrerte tider.</string>
     <string name="report_no_logs">Ingen loggførte økter.</string>
     <string name="btn_add_workplace">LEGG TIL</string>
+
+    <string name="warning_permission_title">Tilganger mangler! ⚠️</string>
+    <string name="warning_permission_location">Appen trenger \"Posisjon\" for å se ditt Wi-Fi og logge tid automatisk.</string>
+    <string name="warning_permission_notifications">Appen trenger \"Varslinger\" for å vise status og sende påminnelser.</string>
+    <string name="warning_permission_both">Appen trenger tilgang til både \"Posisjon\" og \"Varslinger\" for å fungere korrekt.</string>
+    <string name="btn_fix_permissions">UTBEDRE NÅ</string>
+
+    <string name="warning_auto_revoke_title">Beskytt appens tilganger 🛡️</string>
+    <string name="warning_auto_revoke_msg">Android kan automatisk fjerne appens tilganger hvis du ikke använder den på en stund. For at Wi-Fi-innloggingen skal fungere stabilt bør du deaktivere dette.</string>
+    <string name="btn_fix_auto_revoke">ENDRE INNSTILLING</string>
+
+    <string name="reminder_login_title">Glemt å logge inn? 🧐</string>
+    <string name="reminder_login_msg">Klokken er %1$s og du pleier å være på plass nå. Vil du logge inn?</string>
+    <string name="reminder_logout_title">Jobber du fortsatt? 🌙</string>
+    <string name="reminder_logout_msg">Du pleier å dra hjem på denna tiden. Ikke glem å sjekke ut!</string>
+    <string name="reminder_lunch_msg">Klar for lunsj? Du pleier å ta pause på denne tiden.</string>
+
+    <string name="settings_theme_title">UTSEENDE &amp; TEMA</string>
+    <string name="theme_classic">KLASSISK (ORANSJE)</string>
+    <string name="theme_modern">MODERNE (EKSPERIMENTELL)</string>
 </resources>

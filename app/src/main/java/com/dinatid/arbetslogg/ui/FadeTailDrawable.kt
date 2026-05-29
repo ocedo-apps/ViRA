@@ -3,10 +3,7 @@ package com.dinatid.arbetslogg.ui
 import android.graphics.*
 import android.graphics.drawable.Drawable
 
-class FadeTailDrawable : Drawable() {
-
-    // Din mörka, intensiva brandorangea färg för "nosen"
-    private val snakeColor = Color.parseColor("#B72B08")
+class FadeTailDrawable(private val snakeColor: Int = Color.parseColor("#B72B08")) : Drawable() {
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE

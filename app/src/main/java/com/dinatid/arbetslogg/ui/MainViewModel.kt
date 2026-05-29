@@ -3,6 +3,7 @@ package com.dinatid.arbetslogg.ui
 import android.app.Application
 import android.content.Context
 import android.graphics.Color
+import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,7 +19,7 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository = TimeRepository(application)
+    private val repository = TimeRepository.getInstance(application)
     private val context = application.applicationContext
 
     private val _uiState = MutableStateFlow(MainUiState())
@@ -26,6 +27,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun refreshData(selectedDateOffset: Int, wifiCountdownSeconds: Int) {
         viewModelScope.launch {
+            val hasLocation = ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            val hasNotifications = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            } else true
+
             val logs = repository.getAllLogs()
             val dailyGoalTotalMin = repository.getDailyGoalMinutes()
             val lunchMin = repository.getLunchMinutes()
@@ -64,11 +70,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val nextDayAlpha = if (selectedDateOffset == 0) 0.3f else 1.0f
             val isNextDayClickable = selectedDateOffset != 0
 
-            val themeColor = Color.parseColor("#FCDEBB")
-            val greenColor = ContextCompat.getColor(context, R.color.status_green)
+            val currentTheme = repository.getAppTheme()
+            val themeColor = if (currentTheme == 1) Color.WHITE else Color.parseColor("#FCDEBB")
+            val greenColor = if (currentTheme == 1) ContextCompat.getColor(context, R.color.modern_accent_blue) else ContextCompat.getColor(context, R.color.status_green)
 
             var centerTimeText: String
-            var centerTimeColor: Int
+            var centerTimeColor: Int = themeColor
             var isCountdownVisible = false
             var currentSsidText: String
             var currentWorkplaceText = ""
@@ -198,26 +205,31 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val expectedPercentOfTotalMonth = if (totalGoalMinForMonth > 0) expectedUntilToday.toFloat() / totalGoalMinForMonth.toFloat() else 0f
             val expectedPct = expectedPercentOfTotalMonth * 100f
 
-            val progressColor = if (balance >= 0) Color.parseColor("#4CAF50") else Color.parseColor("#F3AD5A")
+            val progressColor = if (balance >= 0) {
+                if (currentTheme == 1) ContextCompat.getColor(context, R.color.modern_status_green) 
+                else greenColor
+            } else Color.parseColor("#F3AD5A")
             val absBal = Math.abs(balance)
 
             val prefix = if (balance >= 0) "+" else "-"
             val monthBalanceText = context.getString(R.string.month_balance_format, prefix, absBal / 60, absBal % 60)
 
             val lastOutType = lastLogOverall?.type ?: ""
+            val isManualOutLast = lastOutType.contains("Manuell", ignoreCase = true)
+
             val toggleStatusTextStr = if (isCurrentlyIn) {
                 val showAsManual = lastInLog?.ssid?.startsWith("Manuell") == true && !isWifiConnected
                 if (showAsManual) context.getString(R.string.toggle_in_manual) else context.getString(R.string.toggle_in_auto)
             } else {
                 when {
+                    isManualOutLast -> context.getString(R.string.toggle_out_manual)
                     lastOutType.contains("Auto", ignoreCase = true) || (wifiCountdownSeconds == -1 && !isWifiConnected && lastOutType.startsWith(WorkLog.TYPE_OUT)) -> {
                         context.getString(R.string.toggle_out_auto)
                     }
-                    lastOutType.contains("Manuell", ignoreCase = true) -> context.getString(R.string.toggle_out_manual)
                     else -> context.getString(R.string.toggle_out_default)
                 }
             }
-            val toggleStatusColor = themeColor
+            val toggleStatusColor = if (isCurrentlyIn) greenColor else themeColor
 
             _uiState.value = MainUiState(
                 currentDate = currentDateText,
@@ -240,7 +252,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 monthProgressColor = progressColor,
                 isCurrentlyIn = isCurrentlyIn,
                 toggleStatusText = toggleStatusTextStr,
-                toggleStatusColor = toggleStatusColor
+                toggleStatusColor = toggleStatusColor,
+                isLocationPermissionMissing = !hasLocation,
+                isNotificationPermissionMissing = !hasNotifications
             )
         }
     }
@@ -265,6 +279,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
                 repository.insertLogoutWithMidnightSplit(inTime, now, ssid, true)
                 repository.setManualOverride(true)
+                repository.setManualOverrideSsid(repository.getCurrentSsid())
             } else {
                 if (lastLog != null && lastLog.type.startsWith(WorkLog.TYPE_OUT)) {
                     val timeSinceLogout = now - lastLog.timestamp
@@ -425,5 +440,7 @@ data class MainUiState(
     val monthProgressColor: Int = Color.parseColor("#4CAF50"),
     val toggleStatusText: String = "UTCHECKAD",
     val toggleStatusColor: Int = Color.GRAY,
-    val isCurrentlyIn: Boolean = false
+    val isCurrentlyIn: Boolean = false,
+    val isLocationPermissionMissing: Boolean = false,
+    val isNotificationPermissionMissing: Boolean = false
 )

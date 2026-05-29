@@ -4,7 +4,7 @@
     android:id="@android:id/text1"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:fontFamily="@font/asap_light"
-    android:textColor="@color/text_main"
-    android:textSize="16sp"
+    android:fontFamily="?attr/fontRegular"
+    android:textColor="?attr/spinnerTextColor"
+    android:textSize="14sp"
     android:gravity="center_vertical" />
