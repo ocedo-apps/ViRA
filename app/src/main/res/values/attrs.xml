@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="mainBackground" format="reference|color" />
+    <attr name="bottomNavBackground" format="reference|color" />
+    <attr name="titleTextColor" format="color" />
+    <attr name="spinnerTextColor" format="color" />
+    <attr name="secondaryTextColorCustom" format="color" />
+    <attr name="accentColorCustom" format="color" />
+    <attr name="cardHeaderTextColor" format="color" />
+    <attr name="arrowTintColor" format="color" />
+    <attr name="sectionHeaderTextColor" format="color" />
+    <attr name="loggedTimeColor" format="color" />
+    <attr name="mutedTextColorOnSurface" format="color" />
+    <attr name="buttonTextActiveColor" format="color" />
+    <attr name="buttonTextInactiveColor" format="color" />
+    <attr name="calendarHeaderColor" format="color" />
+    <attr name="calendarArrowColor" format="color" />
+    <attr name="calendarWeekdayColor" format="color" />
+
+    <attr name="fontRegular" format="reference" />
+    <attr name="fontBold" format="reference" />
+    <attr name="fontSemiBold" format="reference" />
+    <attr name="fontLight" format="reference" />
+</resources>

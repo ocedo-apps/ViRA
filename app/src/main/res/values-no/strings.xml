@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ViRA</string>
+    <string name="date_today">I DAG</string>
+    <string name="date_yesterday">I GÅR</string>
+    <string name="status_logged_time">LOGGET TID</string>
+    <string name="empty_value">---</string>
+
+    <string name="settings_title">INNSTILLINGER</string>
+    <string name="settings_smarthelp_title">SMARTHELP</string>
+    <string name="toggle_off">AV</string>
+    <string name="toggle_on">PÅ</string>
+    <string name="settings_mode_employee">ANSATT</string>
+    <string name="settings_mode_consultant">KONSULENT</string>
+    <string name="settings_smarthelp_desc">Velg hvordan appen skal håndtere dine inn- og utsjekkinger på en intelligent måte.</string>
+    <string name="settings_calendar_title">KALENDERINTEGRASJON</string>
+    <string name="settings_consultant_goal_title">Konsulenttimer, mål per måned</string>
+    <string name="settings_consultant_goal_hint">F.eks. 160</string>
+    <string name="settings_workplaces_title">MINE ARBEIDSPLASSER</string>
+    <string name="settings_workplace_name_hint">F.eks. Kontoret eller Butikken</string>
+    <string name="settings_defaults_title">STANDARDTIDER &amp; MÅL</string>
+    <string name="settings_daily_goal_title">Dagsmål (timer)</string>
+    <string name="settings_lunch_minutes_title">Standard lunsjavdrag (minutter)</string>
+    <string name="settings_rounding_title">Tidsavrunding</string>
+    <string name="settings_save_button">LAGRE ALLE INNSTILLINGER</string>
+
+    <string name="warning_outside_zone">ADVARSEL: UTENFOR SONEN!</string>
+    <string name="status_checked_out">Utsjekket</string>
+    <string name="circle_in_time">INN: %1$s</string>
+
+    <string name="toggle_in_manual">INNSJEKKET (MANUELL)</string>
+    <string name="toggle_in_auto">INNSJEKKET (AUTO)</string>
+    <string name="toggle_out_manual">UTSJEKKET (MANUELL)</string>
+    <string name="toggle_out_auto">UTSJEKKET (AUTO)</string>
+    <string name="toggle_out_default">UTSJEKKET</string>
+
+    <string name="pepp_new_day">VELKOMMEN TIL EN NY DAG!</string>
+    <string name="pepp_opportunities">NY DAG, NYE MULIGHETER!</string>
+    <string name="pepp_lunch">HÅPER ALT RULLER OG GÅR FINT!</string>
+    <string name="pepp_almost_there">NESTEN DER, SISTE SPURTEN!</string>
+    <string name="pepp_goal_reached">MÅLET NÅDD! DU ER EN STJERNE! ⭐</string>
+    <string name="pepp_overtime">OVERTIDSARBEID?</string>
+    <string name="pepp_late_worker">NÅR SOLA GÅR I VEST, ARBEIDER DEN LATE BEST ;)</string>
+    <string name="pepp_forgot_phone">GLEMT TELEFONEN PÅ JOBBEN?</string>
+    <string name="pepp_good_work">BRA JOBBET I DAG!</string>
+    <string name="pepp_checked_in">INNSJEKKET</string>
+    <string name="pepp_checked_out">UTSJEKKET</string>
+
+    <string name="month_balance_format">%1$s%2$dt %3$02dm</string>
+    <string name="report_title">TIMEREGISTRERING</string>
+    <string name="report_weekly_total_placeholder">DENNE UKEN - 0t 0min</string>
+    <string name="report_monthly_total_placeholder">DENNE MÅNEDEN - 0t 0min</string>
+    <string name="report_export_all">EKSPORTER ALLE KUNDER</string>
+
+    <string name="holiday_nyarsdagen">GODT NYTT ÅR! 🎉</string>
+    <string name="holiday_trettondedag_jul">God fortsettelse! ❄️</string>
+    <string name="holiday_langfredagen">En rolig og god langfredag ønskes. 🕊️</string>
+    <string name="holiday_pask">GOD PÅSKE! 🐣</string>
+    <string name="holiday_forsta_maj">VELKOMMEN FØRSTE MAI! 🌲</string>
+    <string name="holiday_kristi_himmelsfard">Ha en fin Kristi himmelfartsdag! ☀️</string>
+    <string name="holiday_nationaldag">GRATULERER MED DAGEN! 🇳🇴</string>
+    <string name="holiday_midsommar">GOD SANKTHANS! 🌸</string>
+    <string name="holiday_jul">GOD JUL! 🎄</string>
+    <string name="holiday_nyarsafton">GODT NYTT ÅR! 🎆</string>
+    <string name="holiday_default_format">GOD %1$s! 🎉</string>
+
+    <string name="dialog_title_dagsanteckning">DAGSNOTAT</string>
+    <string name="btn_dagsanteckning">📝 DAGSNOTAT</string>
+    <string name="btn_spara">LAGRE</string>
+    <string name="hint_dagsanteckning">Skriv eller snakk inn notat…</string>
+    <string name="prompt_speak">Snakk nå…</string>
+    <string name="error_mic_not_supported">Talegjenkjenning støttes ikke på denne enheten</string>
+
+    <string name="msg_logged_time_format">Logget tid: %1$dt %2$dm\n\n</string>
+    <string name="msg_your_note">\n📝 Ditt notat:\n\"%1$s\"</string>
+    <string name="msg_ledig_day">Du var ledig denne dagen.\n</string>
+    <string name="msg_no_time_logged">Ingen tid logget.\n</string>
+
+    <string name="nav_dashboard">I dag</string>
+    <string name="nav_calendar">Kalender</string>
+    <string name="nav_reports">Rapporter</string>
+    <string name="nav_settings">Innstillinger</string>
+
+    <string name="calendar_ongoing">Pågår</string>
+    <string name="calendar_lunch">LUNSJ</string>
+    <string name="calendar_vacation">Ledig</string>
+    <string name="calendar_unknown_ssid">Ukjent</string>
+    <string name="calendar_ongoing_status">PÅGÅR NÅ&#8230;</string>
+
+    <string name="setup_workplace_title">Velkommen till ViRA! 🏗️</string>
+    <string name="setup_workplace_msg">Du har ikke lagt till noen arbeidsplass eller Wi-Fi ennå. Vil du sette det opp nå så appen kan logge tiden din automatisk?</string>
+    <string name="setup_workplace_yes">JA, SETT OPP NÅ</string>
+    <string name="setup_workplace_no">NEI, IKKE NÅ</string>
+    <string name="setup_workplace_later_title">Okei!</string>
+    <string name="setup_workplace_later_msg">Hvis du vil legge till arbeidsplass og Wi-Fi senere, kan du gjøre det under innstillinger.</string>
+
+    <string name="error_no_workplace_title">Ingen arbeidsplass</string>
+    <string name="error_no_workplace_msg">Du må legge till minst én arbeidsplass under innstillinger før du kan sjekke inn manuelt.</string>
+
+    <string name="report_no_workplaces_msg">Du kan ikke opprette timelister uten å ha en arbeidsplass med registrerte tider.</string>
+    <string name="report_no_logs">Ingen loggførte økter.</string>
+    <string name="btn_add_workplace">LEGG TIL</string>
+
+    <string name="warning_permission_title">Tilganger mangler! ⚠️</string>
+    <string name="warning_permission_location">Appen trenger \"Posisjon\" for å se ditt Wi-Fi og logge tid automatisk.</string>
+    <string name="warning_permission_notifications">Appen trenger \"Varslinger\" for å vise status og sende påminnelser.</string>
+    <string name="warning_permission_both">Appen trenger tilgang til både \"Posisjon\" og \"Varslinger\" for å fungere korrekt.</string>
+    <string name="btn_fix_permissions">UTBEDRE NÅ</string>
+
+    <string name="warning_auto_revoke_title">Beskytt appens tilganger 🛡️</string>
+    <string name="warning_auto_revoke_msg">Android kan automatisk fjerne appens tilganger hvis du ikke använder den på en stund. For at Wi-Fi-innloggingen skal fungere stabilt bør du deaktivere dette.</string>
+    <string name="btn_fix_auto_revoke">ENDRE INNSTILLING</string>
+
+    <string name="reminder_login_title">Glemt å logge inn? 🧐</string>
+    <string name="reminder_login_msg">Klokken er %1$s og du pleier å være på plass nå. Vil du logge inn?</string>
+    <string name="reminder_logout_title">Jobber du fortsatt? 🌙</string>
+    <string name="reminder_logout_msg">Du pleier å dra hjem på denna tiden. Ikke glem å sjekke ut!</string>
+    <string name="reminder_lunch_msg">Klar for lunsj? Du pleier å ta pause på denne tiden.</string>
+
+    <string name="settings_theme_title">UTSEENDE &amp; TEMA</string>
+    <string name="theme_classic">KLASSISK (ORANSJE)</string>
+    <string name="theme_modern">MODERNE (EKSPERIMENTELL)</string>
+    <string name="settings_daily_goal_hint">F.eks. 8</string>
+    <string name="settings_lunch_minutes_hint">F.eks. 30</string>
+    <string name="status_logging_out_prefix">LOGGER UT OM:</string>
+    <string name="status_manual_in">MANUELL INN</string>
+    <string name="status_auto_in">AUTO INN</string>
+    <string name="status_manual_out">MANUELL UT</string>
+    <string name="status_auto_out">AUTO UT</string>
+</resources>
