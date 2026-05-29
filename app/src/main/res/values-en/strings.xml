@@ -120,4 +120,11 @@
     <string name="settings_theme_title">LOOK &amp; THEME</string>
     <string name="theme_classic">CLASSIC (ORANGE)</string>
     <string name="theme_modern">MODERN (EXPERIMENTAL)</string>
+    <string name="settings_daily_goal_hint">E.g. 8</string>
+    <string name="settings_lunch_minutes_hint">E.g. 30</string>
+    <string name="status_logging_out_prefix">LOGGING OUT IN:</string>
+    <string name="status_manual_in">MANUAL IN</string>
+    <string name="status_auto_in">AUTO IN</string>
+    <string name="status_manual_out">MANUAL OUT</string>
+    <string name="status_auto_out">AUTO OUT</string>
 </resources>

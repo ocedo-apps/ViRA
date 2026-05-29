@@ -1,5 +1,6 @@
 package com.dinatid.arbetslogg.data
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import com.dinatid.arbetslogg.AppDatabase
@@ -16,7 +17,7 @@ sealed class AppEvent {
     data class CountdownUpdate(val secondsLeft: Int) : AppEvent()
 }
 
-class TimeRepository private constructor(private val context: Context) {
+class TimeRepository private constructor(context: Context) {
 
     private val database = AppDatabase.getDatabase(context)
     private val dailyNoteDao = database.dailyNoteDao() 
@@ -131,6 +132,7 @@ class TimeRepository private constructor(private val context: Context) {
         return sharedPrefs.getBoolean("is_wifi_connected", false)
     }
 
+    @SuppressLint("NewApi")
     fun setWifiConnected(connected: Boolean) {
         sharedPrefs.edit().putBoolean("is_wifi_connected", connected).apply()
     }
@@ -139,6 +141,7 @@ class TimeRepository private constructor(private val context: Context) {
         return sharedPrefs.getString("current_ssid", null)
     }
 
+    @SuppressLint("NewApi")
     fun setCurrentSsid(ssid: String?) {
         sharedPrefs.edit().putString("current_ssid", ssid).apply()
     }
@@ -147,6 +150,7 @@ class TimeRepository private constructor(private val context: Context) {
         return sharedPrefs.getBoolean("manual_override", false)
     }
 
+    @SuppressLint("NewApi")
     fun setManualOverride(active: Boolean) {
         sharedPrefs.edit().putBoolean("manual_override", active).apply()
     }
@@ -155,6 +159,7 @@ class TimeRepository private constructor(private val context: Context) {
         return sharedPrefs.getString("manual_override_ssid", null)
     }
 
+    @SuppressLint("NewApi")
     fun setManualOverrideSsid(ssid: String?) {
         sharedPrefs.edit().putString("manual_override_ssid", ssid).apply()
     }
@@ -166,6 +171,7 @@ class TimeRepository private constructor(private val context: Context) {
         return if (goal <= 0) 480 else goal
     }
 
+    @SuppressLint("NewApi")
     fun setDailyGoalMinutes(minutes: Int) {
         sharedPrefs.edit().putInt("work_goal_total_minutes", minutes).apply()
     }
@@ -175,6 +181,7 @@ class TimeRepository private constructor(private val context: Context) {
         return if (lunch < 0) 45 else lunch
     }
 
+    @SuppressLint("NewApi")
     fun setLunchMinutes(minutes: Int) {
         sharedPrefs.edit().putInt("lunch_minutes", minutes).apply()
     }
@@ -183,6 +190,7 @@ class TimeRepository private constructor(private val context: Context) {
         return sharedPrefs.getString("work_ssid", "")?.replace("\"", "")?.trim() ?: ""
     }
 
+    @SuppressLint("NewApi")
     fun setTargetSsid(ssid: String) {
         sharedPrefs.edit().putString("work_ssid", ssid).apply()
     }
@@ -191,6 +199,7 @@ class TimeRepository private constructor(private val context: Context) {
         return sharedPrefs.getInt("rounding_interval", 0)
     }
 
+    @SuppressLint("NewApi")
     fun setRoundingInterval(minutes: Int) {
         sharedPrefs.edit().putInt("rounding_interval", minutes).apply()
     }
@@ -199,6 +208,7 @@ class TimeRepository private constructor(private val context: Context) {
         return sharedPrefs.getBoolean("declined_workplace_setup", false)
     }
 
+    @SuppressLint("NewApi")
     fun setDeclinedWorkplaceSetup(declined: Boolean) {
         sharedPrefs.edit().putBoolean("declined_workplace_setup", declined).apply()
     }
@@ -207,6 +217,7 @@ class TimeRepository private constructor(private val context: Context) {
         return sharedPrefs.getInt("app_theme", 0) // 0 = Classic, 1 = Modern
     }
 
+    @SuppressLint("NewApi")
     fun setAppTheme(theme: Int) {
         sharedPrefs.edit().putInt("app_theme", theme).apply()
     }

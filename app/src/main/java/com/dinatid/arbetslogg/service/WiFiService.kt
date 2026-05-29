@@ -1,5 +1,6 @@
 package com.dinatid.arbetslogg.service
 
+import android.annotation.SuppressLint
 import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -15,6 +16,7 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.dinatid.arbetslogg.R
 import com.dinatid.arbetslogg.WorkLog
 import com.dinatid.arbetslogg.data.AppEvent
@@ -24,6 +26,7 @@ import com.dinatid.arbetslogg.ui.MainActivity
 import kotlinx.coroutines.*
 import java.util.*
 
+@SuppressLint("MissingPermission", "NewApi")
 class WiFiService : Service() {
 
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -59,6 +62,7 @@ class WiFiService : Service() {
         }
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate() {
         super.onCreate()
         repository = TimeRepository.getInstance(applicationContext)
@@ -67,8 +71,9 @@ class WiFiService : Service() {
             addAction(ACTION_LOGOUT_NOW)
             addAction(ACTION_START_LUNCH)
         }
+        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(actionReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+            registerReceiver(actionReceiver, filter, RECEIVER_NOT_EXPORTED)
         } else {
             registerReceiver(actionReceiver, filter)
         }
@@ -487,11 +492,9 @@ class WiFiService : Service() {
     }
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(NotificationChannel("wifimonitorchannel", "Wi-Fi", NotificationManager.IMPORTANCE_LOW))
-            manager.createNotificationChannel(NotificationChannel("smarthelpchannel", "SmartHelp", NotificationManager.IMPORTANCE_HIGH))
-        }
+        val manager = getSystemService(NotificationManager::class.java)
+        manager.createNotificationChannel(NotificationChannel("wifimonitorchannel", "Wi-Fi", NotificationManager.IMPORTANCE_LOW))
+        manager.createNotificationChannel(NotificationChannel("smarthelpchannel", "SmartHelp", NotificationManager.IMPORTANCE_HIGH))
     }
 
     override fun onBind(intent: Intent?): IBinder? = null

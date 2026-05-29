@@ -1,5 +1,6 @@
 package com.dinatid.arbetslogg.ui
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.graphics.Color
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+@SuppressLint("NewApi")
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = TimeRepository.getInstance(application)
@@ -73,20 +75,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val currentTheme = repository.getAppTheme()
             val themeColor = if (currentTheme == 1) Color.WHITE else Color.parseColor("#FCDEBB")
             val greenColor = if (currentTheme == 1) ContextCompat.getColor(context, R.color.modern_accent_blue) else ContextCompat.getColor(context, R.color.status_green)
+            
+            val typedValueAccent = android.util.TypedValue()
+            context.theme.resolveAttribute(R.attr.accentColorCustom, typedValueAccent, true)
+            val accentColor = typedValueAccent.data
 
             var centerTimeText: String
-            var centerTimeColor: Int = themeColor
+            var centerTimeColor: Int
             var isCountdownVisible = false
             var currentSsidText: String
             var currentWorkplaceText = ""
             var inTimeCircleText: String
             var statusTextStr = ""
-            var statusTextColor = themeColor
+            var statusTextColor: Int
 
             val holidayNameOnSelectedDay = HolidayManager.getHolidayName(cal)
 
             if (wifiCountdownSeconds >= 0 && selectedDateOffset == 0 && isCurrentlyIn) {
-                centerTimeText = String.format("%02d:%02d", wifiCountdownSeconds / 60, wifiCountdownSeconds % 60)
+                centerTimeText = String.format(Locale.getDefault(), "%02d:%02d", wifiCountdownSeconds / 60, wifiCountdownSeconds % 60)
                 centerTimeColor = Color.parseColor("#F44336")
                 isCountdownVisible = true
                 currentSsidText = context.getString(R.string.status_logging_out_prefix)
@@ -95,11 +101,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 statusTextStr = context.getString(R.string.warning_outside_zone)
                 statusTextColor = Color.parseColor("#F44336")
             } else {
-                centerTimeText = String.format("%02d:%02d", dayMin / 60, dayMin % 60)
+                centerTimeText = String.format(Locale.getDefault(), "%02d:%02d", dayMin / 60, dayMin % 60)
                 centerTimeColor = themeColor
 
                 if (isCurrentlyIn && lastInLog != null) {
-                    val rawSsid = lastInLog.ssid ?: ""
+                    val rawSsid = lastInLog.ssid
                     val isManual = rawSsid.startsWith("Manuell", ignoreCase = true)
 
                     currentSsidText = context.getString(if (isManual) R.string.status_manual_in else R.string.status_auto_in)
@@ -114,7 +120,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 } else {
                     if (selectedDateOffset == 0 && lastLogOverall != null) {
                         val outType = lastLogOverall.type
-                        val rawSsid = lastLogOverall.ssid ?: ""
+                        val rawSsid = lastLogOverall.ssid
 
                         val isManualOut = outType.contains("Manuell", ignoreCase = true)
                         currentSsidText = context.getString(if (isManualOut) R.string.status_manual_out else R.string.status_auto_out)
@@ -143,7 +149,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                             if (resId != 0) {
                                 context.getString(resId)
                             } else {
-                                context.getString(R.string.holiday_default_format, holidayNameOnSelectedDay.uppercase())
+                                context.getString(R.string.holiday_default_format, holidayNameOnSelectedDay.uppercase(Locale.getDefault()))
                             }
                         }
                         !isCurrentlyIn && dayMin == 0 -> context.getString(R.string.pepp_new_day)
@@ -157,6 +163,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         !isCurrentlyIn && progressPercent >= 100 -> context.getString(R.string.pepp_good_work)
                         else -> if (isCurrentlyIn) context.getString(R.string.pepp_checked_in) else context.getString(R.string.pepp_checked_out)
                     }
+                    
+                    // Om vi är utcheckade i klassiskt tema, använd den orangea färgen
+                    statusTextColor = if (!isCurrentlyIn && dayMin > 0 && currentTheme == 0) {
+                        accentColor
+                    } else {
+                        themeColor
+                    }
+                } else {
                     statusTextColor = themeColor
                 }
             }
