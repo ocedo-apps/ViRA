@@ -130,14 +130,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                             rawSsid.equals("Manuell", ignoreCase = true) -> ""
                             else -> rawSsid
                         }
+
+                        val timeFormatted = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(lastLogOverall.timestamp))
+                        inTimeCircleText = context.getString(R.string.circle_out_time, timeFormatted)
                     } else if (selectedDateOffset == 0) {
                         currentSsidText = context.getString(R.string.status_checked_out)
                         currentWorkplaceText = ""
+                        inTimeCircleText = context.getString(R.string.empty_value)
                     } else {
                         currentSsidText = context.getString(R.string.empty_value)
                         currentWorkplaceText = ""
+                        inTimeCircleText = context.getString(R.string.empty_value)
                     }
-                    inTimeCircleText = context.getString(R.string.empty_value)
                 }
 
                 if (selectedDateOffset == 0) {
@@ -178,9 +182,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val workProgressBarProgress = if (dailyGoalTotalMin > 0) (dayMin.toFloat() / dailyGoalTotalMin.toFloat() * 100f).toInt() else 0
             val isSecondsVisible = selectedDateOffset == 0 && wifiCountdownSeconds < 0
 
-            val dailyGoalAfterLunch = dailyGoalTotalMin - lunchMin
             val now = Calendar.getInstance()
-            val startOfMonth = (now.clone() as Calendar).apply { set(Calendar.DAY_OF_MONTH, 1) }
+            val startOfMonth = (now.clone() as Calendar).apply {
+                set(Calendar.DAY_OF_MONTH, 1)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
 
             var workDaysUntilToday = 0
             var totalWorkDaysInMonth = 0
@@ -202,21 +211,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val totalGoalMinForMonth = if (smartHelpMode == 2) {
                 consultantGoalMinutes
             } else {
-                totalWorkDaysInMonth * dailyGoalAfterLunch
+                totalWorkDaysInMonth * dailyGoalTotalMin
             }
 
-            val expectedUntilToday = if (smartHelpMode == 2) {
-                val avgDailyPace = totalGoalMinForMonth / Math.max(1, totalWorkDaysInMonth)
-                workDaysUntilToday * avgDailyPace
+            val expectedUntilNow = if (smartHelpMode == 2) {
+                val avgDailyPace = totalGoalMinForMonth.toDouble() / Math.max(1, totalWorkDaysInMonth)
+                (workDaysUntilToday * avgDailyPace).toInt()
             } else {
-                workDaysUntilToday * dailyGoalAfterLunch
+                workDaysUntilToday * dailyGoalTotalMin
             }
 
-            val actualMin = calculateWorkMinutes(logs, startOfMonth.timeInMillis, System.currentTimeMillis())
-            val balance = actualMin - expectedUntilToday
+            val actualMin = calculateWorkMinutes(logs, startOfMonth.timeInMillis, System.currentTimeMillis(), lunchMin)
+            val balance = actualMin - expectedUntilNow
 
             val monthlyProgressBarProgress = if (totalGoalMinForMonth > 0) (actualMin.toFloat() / totalGoalMinForMonth.toFloat() * 100f).toInt() else 0
-            val expectedPercentOfTotalMonth = if (totalGoalMinForMonth > 0) expectedUntilToday.toFloat() / totalGoalMinForMonth.toFloat() else 0f
+            
+            // Mållinjen visar var man borde vara just nu (inklusive dagens mål)
+            val expectedPercentOfTotalMonth = if (totalGoalMinForMonth > 0) expectedUntilNow.toFloat() / totalGoalMinForMonth.toFloat() else 0f
             val expectedPct = expectedPercentOfTotalMonth * 100f
 
             val progressColor = if (balance >= 0) {
@@ -318,31 +329,85 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun calculateWorkMinutes(allLogs: List<WorkLog>, startTs: Long, endTs: Long): Int {
+    private fun calculateWorkMinutes(allLogs: List<WorkLog>, startTs: Long, endTs: Long, lunchToDeduct: Int = 0): Int {
         val rangeLogs = allLogs.filter { it.timestamp in startTs..endTs }
-        val lastLogBefore = allLogs.lastOrNull { it.timestamp < startTs }
+        val lastLogBeforeStart = allLogs.lastOrNull { it.timestamp < startTs }
+        if (rangeLogs.isEmpty() && lastLogBeforeStart?.type != WorkLog.TYPE_IN) return 0
 
-        var isIn = lastLogBefore?.type == WorkLog.TYPE_IN
-        var currentInTs = if (isIn) startTs else 0L
-        var totalMin = 0
-
-        for (log in rangeLogs) {
-            if (log.type == WorkLog.TYPE_IN && !isIn) {
-                currentInTs = log.timestamp
-                isIn = true
-            } else if (log.type.startsWith(WorkLog.TYPE_OUT) && isIn) {
-                totalMin += Math.round((log.timestamp - currentInTs).toDouble() / 60000.0).toInt()
-                isIn = false
-            }
+        // Gruppera loggar per dag
+        val logsByDay = rangeLogs.groupBy {
+            val c = Calendar.getInstance().apply { timeInMillis = it.timestamp }
+            "${c.get(Calendar.YEAR)}-${c.get(Calendar.DAY_OF_YEAR)}"
         }
 
-        if (isIn) {
-            val effectiveEnd = Math.min(System.currentTimeMillis(), endTs)
-            if (effectiveEnd > currentInTs) {
-                totalMin += Math.round((effectiveEnd - currentInTs).toDouble() / 60000.0).toInt()
+        var totalMonthMinutes = 0
+        val now = System.currentTimeMillis()
+        val effectiveEndRange = Math.min(now, endTs)
+
+        // Loopa igenom varje kalenderdag i spannet
+        val cal = Calendar.getInstance().apply { timeInMillis = startTs }
+        val endCal = Calendar.getInstance().apply { timeInMillis = effectiveEndRange }
+
+        var currentlyIn = lastLogBeforeStart?.type == WorkLog.TYPE_IN
+        var currentInTs = if (currentlyIn) startTs else 0L
+
+        while (cal.before(endCal) || isSameDay(cal, endCal)) {
+            val dayKey = "${cal.get(Calendar.YEAR)}-${cal.get(Calendar.DAY_OF_YEAR)}"
+            val dayLogs = logsByDay[dayKey] ?: emptyList()
+            
+            var dayRawMin = 0
+            var largestGapMin = 0
+            var lastOutForGap = 0L
+
+            val dayStartTs = cal.apply { set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0) }.timeInMillis
+            val dayEndTs = cal.apply { set(Calendar.HOUR_OF_DAY, 23); set(Calendar.MINUTE, 59); set(Calendar.SECOND, 59); set(Calendar.MILLISECOND, 999) }.timeInMillis
+            
+            // Om vi kom in i dagen som redan inloggad
+            if (currentlyIn) {
+                currentInTs = Math.max(dayStartTs, startTs)
             }
+
+            for (log in dayLogs) {
+                if (log.type == WorkLog.TYPE_IN && !currentlyIn) {
+                    currentInTs = log.timestamp
+                    currentlyIn = true
+                    
+                    if (lastOutForGap != 0L) {
+                        val gap = ((log.timestamp - lastOutForGap) / 60000).toInt()
+                        if (gap > largestGapMin) largestGapMin = gap
+                    }
+                } else if (log.type.startsWith(WorkLog.TYPE_OUT) && currentlyIn) {
+                    dayRawMin += ((log.timestamp - currentInTs) / 60000).toInt()
+                    currentlyIn = false
+                    lastOutForGap = log.timestamp
+                }
+            }
+
+            if (currentlyIn) {
+                val effectiveDayEnd = Math.min(effectiveEndRange, dayEndTs)
+                if (effectiveDayEnd > currentInTs) {
+                    dayRawMin += ((effectiveDayEnd - currentInTs) / 60000).toInt()
+                }
+            }
+
+            // Smart Lunch
+            var actualDeduct = 0
+            if (dayRawMin > 300 && largestGapMin < 20) {
+                actualDeduct = lunchToDeduct
+            }
+            totalMonthMinutes += Math.max(0, dayRawMin - actualDeduct)
+
+            // Gå till nästa dag
+            cal.timeInMillis = dayStartTs
+            cal.add(Calendar.DAY_OF_YEAR, 1)
         }
-        return totalMin
+
+        return totalMonthMinutes
+    }
+
+    private fun isSameDay(c1: Calendar, c2: Calendar): Boolean {
+        return c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) && 
+               c1.get(Calendar.DAY_OF_YEAR) == c2.get(Calendar.DAY_OF_YEAR)
     }
 }
 

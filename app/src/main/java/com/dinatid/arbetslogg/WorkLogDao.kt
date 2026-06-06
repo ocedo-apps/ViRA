@@ -20,6 +20,9 @@ interface WorkLogDao {
     @Query("DELETE FROM work_logs")
     suspend fun deleteAll(): Int
 
+    @Update
+    suspend fun update(log: WorkLog)
+
     @Delete
     suspend fun delete(log: WorkLog): Int
 }

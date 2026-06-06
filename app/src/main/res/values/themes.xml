@@ -76,6 +76,20 @@
         <item name="android:popupBackground">@color/modern_card_bg</item>
         <item name="android:colorBackground">@color/modern_bg</item>
         <item name="materialAlertDialogTheme">@style/ViRADialogTheme.Modern</item>
+        <item name="android:timePickerDialogTheme">@style/ViRATimePickerTheme</item>
+    </style>
+
+    <style name="ViRATimePickerTheme" parent="Theme.AppCompat.Dialog">
+        <item name="colorAccent">@color/modern_accent_orange</item>
+        <item name="android:windowBackground">@color/modern_card_bg</item>
+        <item name="android:background">@color/modern_card_bg</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">#AAAAAA</item>
+
+        <!-- Urtavlan ska vara ljus för att siffrorna ska synas -->
+        <item name="android:numbersBackgroundColor">#EEEEEE</item>
+        <item name="android:numbersTextColor">#212121</item>
+        <item name="android:numbersSelectorColor">@color/modern_accent_orange</item>
     </style>
 
     <style name="ViRADialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">

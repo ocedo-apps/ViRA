@@ -36,6 +36,25 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
     private lateinit var viewPager: androidx.viewpager2.widget.ViewPager2
+    
+    private var proactiveReasonEditText: android.widget.EditText? = null
+    private lateinit var proactiveSpeechLauncher: androidx.activity.result.ActivityResultLauncher<Intent>
+    private var activeProactiveDialog: android.app.Dialog? = null
+
+    private fun setupSpeechRecognition() {
+        proactiveSpeechLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == android.app.Activity.RESULT_OK) {
+                val matches = result.data?.getStringArrayListExtra(android.speech.RecognizerIntent.EXTRA_RESULTS)
+                if (!matches.isNullOrEmpty()) {
+                    val spokenText = matches[0]
+                    val currentText = proactiveReasonEditText?.text?.toString() ?: ""
+                    val newText = if (currentText.isEmpty()) spokenText else "$currentText $spokenText"
+                    proactiveReasonEditText?.setText(newText)
+                    proactiveReasonEditText?.setSelection(newText.length)
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val repo = TimeRepository.getInstance(applicationContext)
@@ -48,6 +67,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        setupSpeechRecognition()
+        listenForAppEvents()
+        checkIntentForProactiveGap(intent)
         checkIntentForGapDialog(intent)
         checkIntentForOvertimeDialog(intent)
 
@@ -137,6 +159,18 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    private fun listenForAppEvents() {
+        lifecycleScope.launch {
+            val repo = TimeRepository.getInstance(applicationContext)
+            repo.events.collect { event ->
+                if (event is com.dinatid.arbetslogg.data.AppEvent.DismissProactiveDialog) {
+                    activeProactiveDialog?.dismiss()
+                    activeProactiveDialog = null
+                }
+            }
+        }
+    }
+
     private fun checkWorkplaceSetup() {
         val repo = TimeRepository.getInstance(applicationContext)
         val ssid = repo.getTargetSsid()
@@ -192,9 +226,105 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         setIntent(intent)
+        checkIntentForProactiveGap(intent)
         checkIntentForGapDialog(intent)
         checkIntentForOvertimeDialog(intent)
         checkIntentForTabRedirection(intent)
+    }
+
+    private fun checkIntentForProactiveGap(intent: Intent?) {
+        if (intent?.getBooleanExtra("show_proactive_gap", false) == true) {
+            val disconnectTime = intent.getLongExtra("disconnect_time", System.currentTimeMillis())
+            intent.removeExtra("show_proactive_gap")
+            showProactiveGapDialog(disconnectTime)
+        }
+    }
+
+    private fun showProactiveGapDialog(disconnectTime: Long) {
+        if (activeProactiveDialog != null && activeProactiveDialog?.isShowing == true) return
+
+        // Säkerhetskoll för tidsstämpel
+        val effectiveDisconnectTime = if (disconnectTime <= 0) System.currentTimeMillis() else disconnectTime
+
+        val dialogView = layoutInflater.inflate(R.layout.layout_dialog_proactive, null)
+        val btnQuickLunch = dialogView.findViewById<android.widget.Button>(R.id.btnQuickLunch)
+        val btnQuickDone = dialogView.findViewById<android.widget.Button>(R.id.btnQuickDone)
+        val inputNote = dialogView.findViewById<android.widget.EditText>(R.id.inputNote)
+        val micBtn = dialogView.findViewById<android.widget.ImageView>(R.id.micBtn)
+        val btnSparaCustom = dialogView.findViewById<android.widget.Button>(R.id.btnSparaCustom)
+        val btnClose = dialogView.findViewById<android.widget.ImageView>(R.id.btnClose)
+
+        proactiveReasonEditText = inputNote
+
+        activeProactiveDialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setView(dialogView)
+            .setCancelable(true)
+            .setOnDismissListener { activeProactiveDialog = null }
+            .create()
+
+        btnClose.setOnClickListener { activeProactiveDialog?.dismiss() }
+
+        btnQuickLunch.setOnClickListener {
+            lifecycleScope.launch {
+                val repo = TimeRepository.getInstance(applicationContext)
+                val lastLog = repo.getLastLog()
+                if (lastLog?.type == WorkLog.TYPE_IN) {
+                    repo.insertLog(WorkLog(type = WorkLog.TYPE_OUT_AUTO, timestamp = effectiveDisconnectTime, ssid = lastLog.ssid, comment = getString(R.string.calendar_lunch)))
+                }
+                terminateCountdownInService()
+                viewModel.refreshData(0, -1)
+                activeProactiveDialog?.dismiss()
+            }
+        }
+
+        btnQuickDone.setOnClickListener {
+            lifecycleScope.launch {
+                val repo = TimeRepository.getInstance(applicationContext)
+                val lastLog = repo.getLastLog()
+                if (lastLog?.type == WorkLog.TYPE_IN) {
+                    repo.insertLogoutWithMidnightSplit(lastLog.timestamp, effectiveDisconnectTime, lastLog.ssid, false)
+                }
+                terminateCountdownInService()
+                viewModel.refreshData(0, -1)
+                activeProactiveDialog?.dismiss()
+            }
+        }
+
+        micBtn.setOnClickListener {
+            val intent = Intent(android.speech.RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE_MODEL, android.speech.RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                putExtra(android.speech.RecognizerIntent.EXTRA_PROMPT, "Berätta varför du loggar ut...")
+            }
+            try {
+                proactiveSpeechLauncher.launch(intent)
+            } catch (e: Exception) {
+                android.widget.Toast.makeText(this, "Röstinmatning stöds inte", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        btnSparaCustom.setOnClickListener {
+            val reason = inputNote.text.toString().trim().ifEmpty { getString(R.string.proactive_label_other).substringBefore(":") }
+            lifecycleScope.launch {
+                val repo = TimeRepository.getInstance(applicationContext)
+                val lastLog = repo.getLastLog()
+                if (lastLog?.type == WorkLog.TYPE_IN) {
+                    repo.insertLog(WorkLog(type = WorkLog.TYPE_OUT_AUTO, timestamp = effectiveDisconnectTime, ssid = lastLog.ssid, comment = reason))
+                }
+                terminateCountdownInService()
+                viewModel.refreshData(0, -1)
+                activeProactiveDialog?.dismiss()
+            }
+        }
+
+        activeProactiveDialog?.show()
+    }
+
+    private fun terminateCountdownInService() {
+        val stopIntent = Intent(applicationContext, com.dinatid.arbetslogg.service.WiFiService::class.java).apply {
+            action = "TERMINATE_LOGOUT_SEQUENCE"
+        }
+        startService(stopIntent)
     }
 
     private fun checkIntentForTabRedirection(intent: Intent?) {
@@ -210,6 +340,8 @@ class MainActivity : AppCompatActivity() {
             val workplace = intent.getStringExtra("workplace") ?: "Jobbet"
             val outTime = intent.getLongExtra("out_time", 0L)
             val inTime = intent.getLongExtra("in_time", 0L)
+            intent.removeExtra("show_gap_dialog")
+            intent.removeExtra("show_lunch_dialog")
             showGapDialog(workplace, outTime, inTime)
         }
     }
@@ -259,6 +391,7 @@ class MainActivity : AppCompatActivity() {
         if (intent?.getBooleanExtra("show_overtime_dialog", false) == true) {
             val workplace = intent.getStringExtra("workplace") ?: "Jobbet"
             val inTime = intent.getLongExtra("in_time", 0L)
+            intent.removeExtra("show_overtime_dialog")
             showOvertimeDialog(workplace, inTime)
         }
     }
@@ -292,6 +425,12 @@ class MainActivity : AppCompatActivity() {
                 dialog.dismiss()
             }
             .show()
+    }
+
+    override fun onDestroy() {
+        activeProactiveDialog?.dismiss()
+        activeProactiveDialog = null
+        super.onDestroy()
     }
 
     override fun onStart() {

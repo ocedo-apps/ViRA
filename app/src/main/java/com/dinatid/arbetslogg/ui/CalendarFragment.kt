@@ -36,7 +36,6 @@ class CalendarFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // --- REGISTRERA RÖST-LYSSNAREN FÖR FRAGMENT ---
         speechLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val matches = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
@@ -70,7 +69,6 @@ class CalendarFragment : Fragment() {
         btnPrevMonth.setOnClickListener { viewModel.changeMonth(-1) }
         btnNextMonth.setOnClickListener { viewModel.changeMonth(1) }
 
-        // I Fragments använder vi viewLifecycleOwner för coroutines
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.currentMonthText.collectLatest { monthText ->
                 txtCurrentMonth.text = monthText
@@ -117,7 +115,6 @@ class CalendarFragment : Fragment() {
 
                     val timeFormatter = SimpleDateFormat("HH:mm", Locale.getDefault())
 
-                    // Hitta lunch-index för att kunna skriva "LUNCH" på rätt rader
                     var lunchOutIndex = -1
                     var lunchInIndex = -1
                     var lastOutTs = 0L
@@ -152,14 +149,15 @@ class CalendarFragment : Fragment() {
                         }
 
                         val ssid = log.ssid.takeIf { it.isNotEmpty() } ?: getString(R.string.calendar_unknown_ssid)
-                        msg += "• $type kl $time ($ssid)"
+                        val editMarker = if (log.isManuallyEdited) " <font color='#808080' size='10'>${getString(R.string.edit_log_edited_marker)}</font>" else ""
+                        
+                        msg += "• $type kl $time ($ssid)$editMarker"
                         if (!log.comment.isNullOrBlank()) {
-                            msg += " <font color='#FF9800'>[$log.comment]</font>"
+                            msg += " <font color='#FF9800'>[${log.comment}]</font>"
                         }
                         msg += "\n"
                     }
 
-                    // NYTT: Visa om ett pass pågår just nu med animerade prickar
                     if (day.isOngoing) {
                         val dots = when (animStep % 4) {
                             1 -> ".<font color='#00000000'>..</font>"
@@ -171,7 +169,19 @@ class CalendarFragment : Fragment() {
                         msg += "• $ongoingText $dots\n"
                     }
                 } else if (day.isHoliday) {
-                    msg += getString(R.string.msg_ledig_day)
+                    val now = Calendar.getInstance().apply {
+                        set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+                    }
+                    val checkDate = Calendar.getInstance().apply {
+                        time = day.date
+                        set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+                    }
+
+                    if (checkDate.after(now)) {
+                        msg += getString(R.string.msg_ledig_day_future)
+                    } else {
+                        msg += getString(R.string.msg_ledig_day)
+                    }
                 } else {
                     msg += getString(R.string.msg_no_time_logged)
                 }
@@ -180,11 +190,9 @@ class CalendarFragment : Fragment() {
                     msg += getString(R.string.msg_your_note, note)
                 }
 
-                // Ersätt radbrytningar med <br/> för Html.fromHtml
                 return android.text.Html.fromHtml(msg.replace("\n", "<br/>"), android.text.Html.FROM_HTML_MODE_LEGACY)
             }
 
-            // Initial text
             txtDialogMessage.text = buildMessage(0)
 
             val dialog = MaterialAlertDialogBuilder(requireContext())
@@ -192,7 +200,6 @@ class CalendarFragment : Fragment() {
                 .setCancelable(true)
                 .create()
 
-            // STARTA ANIMATIONEN
             var animJob: Job? = null
             if (day.isOngoing) {
                 animJob = viewLifecycleOwner.lifecycleScope.launch {
@@ -218,8 +225,143 @@ class CalendarFragment : Fragment() {
                 showCommentPopup(day, note ?: "")
             }
 
+            txtDialogMessage.setOnClickListener {
+                showLogSelectionForEdit(day)
+                dialog.dismiss()
+            }
+
             dialog.show()
         }
+    }
+
+    private fun showLogSelectionForEdit(day: CalendarDay) {
+        val options = day.dayLogs.map { log ->
+            val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(log.timestamp))
+            val type = if (log.type == com.dinatid.arbetslogg.WorkLog.TYPE_IN) "IN" else "UT"
+            "$type kl $time (${log.ssid})"
+        }.toTypedArray()
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.edit_log_title))
+            .setItems(options) { _, which ->
+                showEditLogDialog(day.dayLogs[which])
+            }
+            .setNeutralButton(getString(R.string.btn_add_manual)) { _, _ ->
+                showAddManualLogDialog(day)
+            }
+            .setNegativeButton(getString(R.string.btn_close), null)
+            .show()
+    }
+
+    private fun showEditLogDialog(log: com.dinatid.arbetslogg.WorkLog) {
+        val dialogView = layoutInflater.inflate(R.layout.layout_dialog_edit_log, null)
+        val txtTime = dialogView.findViewById<TextView>(R.id.txtEditTime)
+        val inputComment = dialogView.findViewById<EditText>(R.id.inputComment)
+        val btnSave = dialogView.findViewById<Button>(R.id.btnSaveEdit)
+        val btnDelete = dialogView.findViewById<ImageView>(R.id.btnDeleteLog)
+        val btnClose = dialogView.findViewById<ImageView>(R.id.btnClose)
+
+        val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
+        txtTime.text = sdf.format(Date(log.timestamp))
+        inputComment.setText(log.comment ?: "")
+
+        val cal = Calendar.getInstance().apply { timeInMillis = log.timestamp }
+        
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setView(dialogView)
+            .setCancelable(true)
+            .create()
+
+        txtTime.setOnClickListener {
+            android.app.TimePickerDialog(requireContext(), R.style.ViRATimePickerTheme, { _, h, m ->
+                cal.set(Calendar.HOUR_OF_DAY, h)
+                cal.set(Calendar.MINUTE, m)
+                txtTime.text = String.format(Locale.getDefault(), "%02d:%02d", h, m)
+            }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+        }
+
+        btnSave.setOnClickListener {
+            val updatedLog = log.copy(
+                timestamp = cal.timeInMillis,
+                comment = inputComment.text.toString().trim().takeIf { it.isNotEmpty() },
+                isManuallyEdited = true
+            )
+            viewLifecycleOwner.lifecycleScope.launch {
+                TimeRepository.getInstance(requireActivity().application).updateLog(updatedLog)
+                dialog.dismiss()
+                viewModel.refresh()
+            }
+        }
+
+        btnDelete.setOnClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setMessage(getString(R.string.edit_log_delete_confirm))
+                .setPositiveButton(getString(R.string.edit_log_btn_delete)) { _, _ ->
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        TimeRepository.getInstance(requireActivity().application).deleteLog(log)
+                        dialog.dismiss()
+                        viewModel.refresh()
+                    }
+                }
+                .setNegativeButton(getString(R.string.setup_workplace_no), null)
+                .show()
+        }
+
+        btnClose.setOnClickListener { dialog.dismiss() }
+        dialog.show()
+    }
+
+    private fun showAddManualLogDialog(day: CalendarDay) {
+        val cal = Calendar.getInstance().apply { 
+            time = day.date!!
+            set(Calendar.HOUR_OF_DAY, 8)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        
+        val dialogView = layoutInflater.inflate(R.layout.layout_dialog_edit_log, null)
+        val txtTime = dialogView.findViewById<TextView>(R.id.txtEditTime)
+        val inputComment = dialogView.findViewById<EditText>(R.id.inputComment)
+        val btnSave = dialogView.findViewById<Button>(R.id.btnSaveEdit)
+        val btnDelete = dialogView.findViewById<ImageView>(R.id.btnDeleteLog)
+        val btnClose = dialogView.findViewById<ImageView>(R.id.btnClose)
+        
+        dialogView.findViewById<TextView>(R.id.txtEditTitle).text = getString(R.string.btn_add_manual)
+        btnDelete.visibility = View.GONE
+        txtTime.text = "08:00"
+        
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setView(dialogView)
+            .create()
+
+        btnClose.setOnClickListener { dialog.dismiss() }
+
+        txtTime.setOnClickListener {
+            android.app.TimePickerDialog(requireContext(), R.style.ViRATimePickerTheme, { _, h, m ->
+                cal.set(Calendar.HOUR_OF_DAY, h)
+                cal.set(Calendar.MINUTE, m)
+                txtTime.text = String.format(Locale.getDefault(), "%02d:%02d", h, m)
+            }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+        }
+
+        btnSave.setOnClickListener {
+            val note = inputComment.text.toString().trim().takeIf { it.isNotEmpty() }
+            val newLog = com.dinatid.arbetslogg.WorkLog(
+                type = com.dinatid.arbetslogg.WorkLog.TYPE_IN,
+                timestamp = cal.timeInMillis,
+                ssid = "Manuell",
+                comment = note,
+                isManuallyEdited = true
+            )
+            viewLifecycleOwner.lifecycleScope.launch {
+                TimeRepository.getInstance(requireActivity().application).insertLog(newLog)
+                dialog.dismiss()
+                viewModel.refresh()
+            }
+        }
+        
+        dialog.show()
     }
 
     private fun showCommentPopup(day: CalendarDay, currentNote: String) {

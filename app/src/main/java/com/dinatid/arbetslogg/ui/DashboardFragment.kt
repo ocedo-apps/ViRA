@@ -195,6 +195,9 @@ class DashboardFragment : Fragment() {
                         wifiCountdownSeconds = event.secondsLeft
                         viewModel.refreshData(selectedDateOffset, wifiCountdownSeconds)
                     }
+                    is AppEvent.DismissProactiveDialog -> {
+                        // Dialogen hanteras av MainActivity, men vi måste hantera händelsen här för att vara kompletta
+                    }
                 }
             }
         }

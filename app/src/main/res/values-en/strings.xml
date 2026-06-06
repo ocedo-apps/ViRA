@@ -127,4 +127,19 @@
     <string name="status_auto_in">AUTO IN</string>
     <string name="status_manual_out">MANUAL OUT</string>
     <string name="status_auto_out">AUTO OUT</string>
+    <string name="proactive_title">WHAT ARE YOU DOING? 👋</string>
+    <string name="proactive_desc">Choose a reason to log out immediately, or enter a custom one below.</string>
+    <string name="proactive_btn_lunch">LUNCH 🍔</string>
+    <string name="proactive_btn_done">DONE 👋</string>
+    <string name="proactive_label_other">OTHER REASON:</string>
+    <string name="proactive_hint_other">E.g. Client meeting...</string>
+    <string name="proactive_btn_save">SAVE &amp; OUT</string>
+    <string name="edit_log_title">EDIT TIME</string>
+    <string name="edit_log_time_label">Time:</string>
+    <string name="edit_log_comment_label">Comment:</string>
+    <string name="edit_log_edited_marker">(Edited)</string>
+    <string name="edit_log_delete_confirm">Do you want to delete this log entry completely?</string>
+    <string name="edit_log_btn_delete">DELETE</string>
+    <string name="btn_add_manual">ADD SESSION</string>
+    <string name="btn_close">CLOSE</string>
 </resources>

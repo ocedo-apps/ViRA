@@ -39,6 +39,8 @@ class WiFiService : Service() {
     private var lastManualResetDay = -1
     private var lastLoginReminderDay = -1
     private var lastLogoutReminderDay = -1
+    private var lastAskedGapTimestamp: Long = 0
+    private var lastShownNotificationText: String? = null
 
     private lateinit var repository: TimeRepository
 
@@ -48,21 +50,52 @@ class WiFiService : Service() {
                 ACTION_LOGOUT_NOW -> {
                     Log.d("WiFiService", "Action: Logout Now")
                     performLogout(System.currentTimeMillis())
-                    val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                    nm.cancel(3) // Overtime
-                    nm.cancel(5) // Logout nudge
+                    terminateLogoutSequence()
                 }
                 ACTION_START_LUNCH -> {
                     Log.d("WiFiService", "Action: Start Lunch")
                     performLogout(System.currentTimeMillis())
-                    val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                    nm.cancel(4) // Lunch nudge
+                    terminateLogoutSequence()
+                }
+                ACTION_LOGOUT_LUNCH -> {
+                    Log.d("WiFiService", "Action: Logout for Lunch")
+                    performLogoutWithComment(disconnectTimestamp, getString(R.string.calendar_lunch))
+                    terminateLogoutSequence()
+                }
+                ACTION_LOGOUT_DONE -> {
+                    Log.d("WiFiService", "Action: Logout Done for day")
+                    performLogout(disconnectTimestamp)
+                    terminateLogoutSequence()
                 }
             }
         }
     }
 
-    @SuppressLint("UnspecifiedRegisterReceiverFlag")
+    private fun terminateLogoutSequence() {
+        disconnectTimestamp = 0L
+        sendCountdownUpdate(-1)
+        val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        nm.cancel(1) // Wifi status notif
+        nm.cancel(3) // Overtime
+        nm.cancel(4) // Lunch nudge
+        nm.cancel(5) // Logout nudge
+        serviceScope.launch {
+            repository.emitEvent(AppEvent.DismissProactiveDialog)
+        }
+        updateNotification("Tjänsten är aktiv")
+    }
+
+    private fun performLogoutWithComment(effectiveTime: Long, comment: String) {
+        serviceScope.launch {
+            val lastLog = repository.getLastLog()
+            if (lastLog?.type == WorkLog.TYPE_IN) {
+                repository.insertLog(WorkLog(type = WorkLog.TYPE_OUT_AUTO, timestamp = effectiveTime, ssid = lastLog.ssid, comment = comment))
+                updateNotification("Utcheckad (Auto)")
+                notifyDataChanged()
+            }
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
         repository = TimeRepository.getInstance(applicationContext)
@@ -70,16 +103,18 @@ class WiFiService : Service() {
         val filter = IntentFilter().apply {
             addAction(ACTION_LOGOUT_NOW)
             addAction(ACTION_START_LUNCH)
+            addAction(ACTION_LOGOUT_LUNCH)
+            addAction(ACTION_LOGOUT_DONE)
         }
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(actionReceiver, filter, RECEIVER_NOT_EXPORTED)
-        } else {
-            registerReceiver(actionReceiver, filter)
-        }
+        androidx.core.content.ContextCompat.registerReceiver(
+            this,
+            actionReceiver,
+            filter,
+            androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED
+        )
 
         createNotificationChannel()
-        startForeground(1, createNotification("Tjänsten är aktiv"))
+        startForeground(1, createNotification("ViRA Wi-Fi-vakt"))
         setupWifiMonitoring()
         startBackupCheckLoop()
 
@@ -88,9 +123,26 @@ class WiFiService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action == "FORCE_CHECK") {
-            Log.d("ViRA_WIFI", "FORCE_CHECK mottagen från UI")
-            checkCurrentWifi()
+        when (intent?.action) {
+            "FORCE_CHECK" -> {
+                Log.d("ViRA_WIFI", "FORCE_CHECK mottagen från UI")
+                checkCurrentWifi()
+            }
+            "CANCEL_COUNTDOWN" -> {
+                Log.d("ViRA_WIFI", "CANCEL_COUNTDOWN mottagen")
+                disconnectTimestamp = 0L
+                sendCountdownUpdate(-1)
+                serviceScope.launch {
+                    repository.emitEvent(AppEvent.DismissProactiveDialog)
+                }
+                updateNotification("ViRA Wi-Fi-vakt")
+            }
+            "TERMINATE_LOGOUT_SEQUENCE" -> {
+                Log.d("ViRA_WIFI", "TERMINATE_LOGOUT_SEQUENCE mottagen - nollställer tidsstämpel")
+                disconnectTimestamp = 0L
+                sendCountdownUpdate(-1)
+                updateNotification("ViRA Wi-Fi-vakt")
+            }
         }
         return START_STICKY
     }
@@ -200,6 +252,7 @@ class WiFiService : Service() {
                         }
                         disconnectTimestamp = 0L
                         sendCountdownUpdate(-1)
+                        repository.emitEvent(AppEvent.DismissProactiveDialog)
                     }
                 } else {
                     if (repository.isManualOverride() && ssid == repository.getManualOverrideSsid()) {
@@ -215,9 +268,13 @@ class WiFiService : Service() {
                                 if (smartHelpMode == 1 && lastLog != null && lastLog.type.startsWith(WorkLog.TYPE_OUT)) {
                                     val gapMin = (now - lastLog.timestamp) / 60000
                                     
-                                    // Fråga om alla gap över 20 minuter
-                                    if (gapMin >= 20) {
-                                        askGapQuestion(workplaceName, lastLog.timestamp, now)
+                                    // Fråga om gap mellan 20 minuter och 12 timmar (720 min)
+                                    // Om det gått längre än 12 timmar (t.ex. en helg) loggar vi bara in direkt
+                                    if (gapMin in 20..720) {
+                                        if (lastLog.timestamp != lastAskedGapTimestamp) {
+                                            lastAskedGapTimestamp = lastLog.timestamp
+                                            askGapQuestion(workplaceName, lastLog.timestamp, now)
+                                        }
                                         return@launch
                                     }
                                 }
@@ -229,12 +286,12 @@ class WiFiService : Service() {
             } else {
                 if (isCurrentlyOnWifi && (ssid == "<unknown ssid>" || ssid.contains("unknown", ignoreCase = true))) return
 
-                val wasPreviouslyConnected = isConnectedToWorkWifi
+                val wasPreviouslyConnectedInThisSession = isConnectedToWorkWifi
                 isConnectedToWorkWifi = false
                 repository.setWifiConnected(false)
                 
                 // Om vi lämnat Wi-Fi nollställer vi override så vi är redo för nästa plats/dag
-                if (wasPreviouslyConnected) {
+                if (wasPreviouslyConnectedInThisSession) {
                     repository.setManualOverride(false)
                     repository.setManualOverrideSsid(null)
                 }
@@ -242,14 +299,15 @@ class WiFiService : Service() {
                 serviceScope.launch {
                     val lastLog = repository.getLastLog()
                     val isManualOther = lastLog?.ssid?.contains("Övrigt", ignoreCase = true) == true
-                    if (lastLog?.type == "IN" && (wasPreviouslyConnected || !isManualOther)) {
+                    
+                    // Trigger bara "Wifi Lost" flow om vi faktiskt var uppkopplade nyss
+                    if (lastLog?.type == "IN" && wasPreviouslyConnectedInThisSession && !isManualOther) {
                         if (disconnectTimestamp == 0L) handleWifiLost()
                     } else {
+                        // Om vi är hemma och inte var uppkopplade nyss, se till att rensa eventuellt gammalt skräp
                         if (disconnectTimestamp != 0L) {
-                            disconnectTimestamp = 0L
-                            updateNotification("Tjänsten är aktiv")
+                            terminateLogoutSequence()
                         }
-                        sendCountdownUpdate(-1)
                     }
                 }
             }
@@ -260,13 +318,30 @@ class WiFiService : Service() {
 
     private fun handleWifiLost() {
         val prefs = applicationContext.getSharedPreferences("arbetslogg_prefs", Context.MODE_PRIVATE)
-        if (prefs.getInt("smart_help_mode", 1) == 0) {
+        val smartHelpMode = prefs.getInt("smart_help_mode", 1)
+        
+        if (smartHelpMode == 0) {
             performLogout(System.currentTimeMillis())
         } else if (disconnectTimestamp == 0L) {
             disconnectTimestamp = System.currentTimeMillis()
             updateNotification("Loggar ut automatiskt om 5 min...")
+            
+            // NYTT: Visa proaktiv dialog om SmartHelp är på
+            if (smartHelpMode == 1) {
+                showProactiveGapDialog()
+            }
+            
             notifyDataChanged()
         }
+    }
+
+    private fun showProactiveGapDialog() {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra("show_proactive_gap", true)
+            putExtra("disconnect_time", disconnectTimestamp)
+        }
+        startActivity(intent)
     }
 
     private fun startBackupCheckLoop() {
@@ -280,6 +355,7 @@ class WiFiService : Service() {
                         performLogout(disconnectTimestamp)
                         disconnectTimestamp = 0L
                         sendCountdownUpdate(-1)
+                        repository.emitEvent(AppEvent.DismissProactiveDialog)
                     } else {
                         sendCountdownUpdate(((GRACE_PERIOD_MS - elapsed) / 1000).toInt())
                     }
@@ -481,19 +557,52 @@ class WiFiService : Service() {
     }
 
     private fun createNotification(content: String): Notification {
-        return NotificationCompat.Builder(this, "wifimonitorchannel")
+        val builder = NotificationCompat.Builder(this, "wifimonitorchannel")
             .setContentTitle("ViRA").setContentText(content)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setPriority(NotificationCompat.PRIORITY_LOW).setOngoing(true).build()
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setOngoing(true)
+
+        // Lägg till smarta knappar om vi är i en utloggningssekvens
+        if (disconnectTimestamp != 0L) {
+            val cal = Calendar.getInstance()
+            val hour = cal.get(Calendar.HOUR_OF_DAY)
+
+            val lunchIntent = Intent(ACTION_LOGOUT_LUNCH)
+            val lunchPi = PendingIntent.getBroadcast(this, 20, lunchIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
+            val doneIntent = Intent(ACTION_LOGOUT_DONE)
+            val donePi = PendingIntent.getBroadcast(this, 21, doneIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
+            val customIntent = Intent(this, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                putExtra("show_proactive_gap", true)
+                putExtra("disconnect_time", disconnectTimestamp)
+            }
+            val customPi = PendingIntent.getActivity(this, 22, customIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
+            if (hour in 10..14) {
+                builder.addAction(0, getString(R.string.proactive_btn_lunch), lunchPi)
+            } else {
+                builder.addAction(0, getString(R.string.proactive_btn_done), donePi)
+            }
+            builder.addAction(0, "ANNAT", customPi)
+            builder.setPriority(NotificationCompat.PRIORITY_HIGH) // Gör den mer synlig under nedräkning
+        }
+
+        return builder.build()
     }
 
     private fun updateNotification(content: String) {
+        if (content == lastShownNotificationText && disconnectTimestamp == 0L) return
+        lastShownNotificationText = content
         (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).notify(1, createNotification(content))
     }
 
     private fun createNotificationChannel() {
         val manager = getSystemService(NotificationManager::class.java)
-        manager.createNotificationChannel(NotificationChannel("wifimonitorchannel", "Wi-Fi", NotificationManager.IMPORTANCE_LOW))
+        // Sänk till IMPORTANCE_MIN för att dölja ikonen från statusfältet om möjligt
+        manager.createNotificationChannel(NotificationChannel("wifimonitorchannel", "Wi-Fi", NotificationManager.IMPORTANCE_MIN))
         manager.createNotificationChannel(NotificationChannel("smarthelpchannel", "SmartHelp", NotificationManager.IMPORTANCE_HIGH))
     }
 
@@ -508,5 +617,7 @@ class WiFiService : Service() {
     companion object {
         private const val ACTION_LOGOUT_NOW = "com.dinatid.arbetslogg.ACTION_LOGOUT_NOW"
         private const val ACTION_START_LUNCH = "com.dinatid.arbetslogg.ACTION_START_LUNCH"
+        private const val ACTION_LOGOUT_LUNCH = "com.dinatid.arbetslogg.ACTION_LOGOUT_LUNCH"
+        private const val ACTION_LOGOUT_DONE = "com.dinatid.arbetslogg.ACTION_LOGOUT_DONE"
     }
 }

@@ -15,6 +15,7 @@ import java.util.Calendar
 sealed class AppEvent {
     object RefreshData : AppEvent()
     data class CountdownUpdate(val secondsLeft: Int) : AppEvent()
+    object DismissProactiveDialog : AppEvent()
 }
 
 class TimeRepository private constructor(context: Context) {
@@ -59,6 +60,10 @@ class TimeRepository private constructor(context: Context) {
 
     suspend fun insertLog(log: WorkLog) = withContext(Dispatchers.IO) {
         database.workLogDao().insert(log)
+    }
+
+    suspend fun updateLog(log: WorkLog) = withContext(Dispatchers.IO) {
+        database.workLogDao().update(log)
     }
 
     suspend fun deleteLog(log: WorkLog) = withContext(Dispatchers.IO) {

@@ -9,7 +9,8 @@ data class WorkLog(
     val type: String, // Databasen lagrar fortfarande text som vanligt under huven
     val timestamp: Long,
     val ssid: String,
-    val comment: String? = null
+    val comment: String? = null,
+    val isManuallyEdited: Boolean = false
 ) {
     // --- FIX: Här låser vi namnen så att kompilatorn varnar dig direkt om du råkar stava fel ---
     companion object {

@@ -127,4 +127,19 @@
     <string name="status_auto_in">AUTO INN</string>
     <string name="status_manual_out">MANUELL UT</string>
     <string name="status_auto_out">AUTO UT</string>
+    <string name="proactive_title">HVA GJØR DU? 👋</string>
+    <string name="proactive_desc">Velg årsak for å logge ut med en gang, eller oppgi en egen nedenfor.</string>
+    <string name="proactive_btn_lunch">LUNSJ 🍔</string>
+    <string name="proactive_btn_done">FERDIG 👋</string>
+    <string name="proactive_label_other">ANNEN ÅRSAK:</string>
+    <string name="proactive_hint_other">F.eks. Kundemøte...</string>
+    <string name="proactive_btn_save">LAGRE &amp; UT</string>
+    <string name="edit_log_title">ENDRE TID</string>
+    <string name="edit_log_time_label">Klokkeslett:</string>
+    <string name="edit_log_comment_label">Kommentar:</string>
+    <string name="edit_log_edited_marker">(Endret)</string>
+    <string name="edit_log_delete_confirm">Vil du slette denne loggføringen helt?</string>
+    <string name="edit_log_btn_delete">SLETT</string>
+    <string name="btn_add_manual">LEGG TIL ØKT</string>
+    <string name="btn_close">LUKK</string>
 </resources>

@@ -7,8 +7,8 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-// --- VIKTIGT: VERSIONEN ÄR NU UPPHÖJD TILL 3 OCH HAR TVÅ ENTITIES ---
-@Database(entities = [WorkLog::class, DailyNote::class], version = 3)
+// --- VIKTIGT: VERSIONEN ÄR NU UPPHÖJD TILL 4 OCH HAR TVÅ ENTITIES ---
+@Database(entities = [WorkLog::class, DailyNote::class], version = 4)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun workLogDao(): WorkLogDao
     abstract fun dailyNoteDao(): DailyNoteDao // <- NY DAO REGISTERAD
@@ -37,6 +37,13 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        // --- NY MAGI: MIGRERING FRÅN VERSION 3 TILL 4 ---
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE work_logs ADD COLUMN isManuallyEdited INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -44,7 +51,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "work_log_database"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3) // <- BERÄTTAR FÖR ROOM OM BÅDA MIGRERINGARNA
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4) // <- BERÄTTAR FÖR ROOM OM ALLA MIGRERINGAR
                     .build()
                 INSTANCE = instance
                 instance

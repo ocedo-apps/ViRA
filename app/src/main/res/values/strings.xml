@@ -34,6 +34,7 @@
     <string name="status_auto_out" tools:ignore="MissingTranslation">AUTO UT</string>
     <string name="status_checked_out">Utcheckad</string>
     <string name="circle_in_time">IN: %1$s</string>
+    <string name="circle_out_time">UT: %1$s</string>
 
     <string name="toggle_in_manual">INCHECKAD (MANUELL)</string>
     <string name="toggle_in_auto">INCHECKAD (AUTO)</string>
@@ -81,6 +82,7 @@
     <string name="msg_logged_time_format">Loggad tid: %1$dh %2$dm\n\n</string>
     <string name="msg_your_note">\n📝 Din anteckning:\n\"%1$s\"</string>
     <string name="msg_ledig_day">Du var ledig denna dag.\n</string>
+    <string name="msg_ledig_day_future">Du är ledig denna dag.\n</string>
     <string name="msg_no_time_logged">Ingen tid loggad.\n</string>
 
     <string name="nav_dashboard">Idag</string>
@@ -127,4 +129,19 @@
     <string name="settings_theme_title">UTSEENDE &amp; TEMA</string>
     <string name="theme_classic">KLASSISK (ORANGE)</string>
     <string name="theme_modern">MODERN (EXPERIMENTELL)</string>
+    <string name="proactive_title">VAD GÖR DU? 👋</string>
+    <string name="proactive_desc">Välj anledning för att logga ut direkt, eller ange en egen nedan.</string>
+    <string name="proactive_btn_lunch">LUNCH 🍔</string>
+    <string name="proactive_btn_done">KLART 👋</string>
+    <string name="proactive_label_other">ANNAN ANLEDNING:</string>
+    <string name="proactive_hint_other">T.ex. Kundmöte...</string>
+    <string name="proactive_btn_save">SPARA &amp; UT</string>
+    <string name="edit_log_title">ÄNDRA TID</string>
+    <string name="edit_log_time_label">Klockslag:</string>
+    <string name="edit_log_comment_label">Kommentar:</string>
+    <string name="edit_log_edited_marker">(Ändrad)</string>
+    <string name="edit_log_delete_confirm">Vill du ta bort denna loggning helt?</string>
+    <string name="edit_log_btn_delete">TA BORT</string>
+    <string name="btn_add_manual">LÄGG TILL PASS</string>
+    <string name="btn_close">STÄNG</string>
 </resources>
